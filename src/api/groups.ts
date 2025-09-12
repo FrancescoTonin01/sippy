@@ -32,7 +32,9 @@ export const getGroups = async (userId: string) => {
     `)
     .eq('user_id', userId)
 
-  const groups = data?.map(item => item.groups).filter(Boolean) || []
+  const groups = data?.map((item: { groups: Group | Group[] }) => 
+    Array.isArray(item.groups) ? item.groups[0] : item.groups
+  ).filter(Boolean) || []
   return { data: groups, error }
 }
 
@@ -113,16 +115,21 @@ export const getGroupMembers = async (groupId: string): Promise<{ data: Member[]
   return { data: members, error: null }
 }
 
-export const searchUsers = async (query: string) => {
+export const searchUsers = async (query: string, excludeUserId?: string) => {
   if (!query.trim() || query.length < 2) {
     return { data: [], error: null }
   }
 
-  const { data, error } = await supabase
+  let queryBuilder = supabase
     .from('users')
     .select('id, username')
     .ilike('username', `%${query}%`)
-    .limit(10)
+
+  if (excludeUserId) {
+    queryBuilder = queryBuilder.neq('id', excludeUserId)
+  }
+
+  const { data, error } = await queryBuilder.limit(10)
 
   return { data: data || [], error }
 }
@@ -204,24 +211,11 @@ interface UserData {
   username: string
 }
 
-interface GroupMemberQueryResult {
-  users: UserData | UserData[]
-}
 
-interface DrinkQueryResult {
-  id: string
-  user_id: string
-  type: string
-  cost: number
-  date: string
-  location: string
-  created_at: string
-  users: UserData | UserData[]
-}
 
 export const getGroupMembersProgress = async (groupId: string): Promise<{ data: GroupMemberProgress[] | null, error: Error | null }> => {
   try {
-    // Get group budget
+    // Get group budget first
     const { data: group, error: groupError } = await supabase
       .from('groups')
       .select('weekly_budget')
@@ -241,7 +235,7 @@ export const getGroupMembersProgress = async (groupId: string): Promise<{ data: 
     const startDateStr = startOfWeek.toISOString().split('T')[0]
     const endDateStr = endOfWeek.toISOString().split('T')[0]
 
-    // Get members with their weekly spending
+    // Get all members
     const { data: membersData, error: membersError } = await supabase
       .from('group_members')
       .select(`
@@ -257,12 +251,12 @@ export const getGroupMembersProgress = async (groupId: string): Promise<{ data: 
       return { data: null, error: membersError }
     }
 
-    if (!membersData) {
+    if (!membersData || membersData.length === 0) {
       return { data: [], error: null }
     }
 
-    // Get weekly drinks for all members
-    const memberIds = membersData.map((item: GroupMemberQueryResult) => 
+    // Get weekly drinks for all members in one query
+    const memberIds = membersData.map((item: { users: UserData | UserData[] }) => 
       Array.isArray(item.users) ? item.users[0].id : item.users.id
     )
 
@@ -277,8 +271,8 @@ export const getGroupMembersProgress = async (groupId: string): Promise<{ data: 
       return { data: null, error: drinksError }
     }
 
-    // Calculate progress for each member
-    const memberProgress: GroupMemberProgress[] = membersData.map((item: GroupMemberQueryResult) => {
+    // Process the data to calculate progress for each member
+    const memberProgress: GroupMemberProgress[] = membersData.map((item: { users: UserData | UserData[] }) => {
       const user = Array.isArray(item.users) ? item.users[0] : item.users
       const userDrinks = drinksData?.filter(drink => drink.user_id === user.id) || []
       const weeklySpent = userDrinks.reduce((sum, drink) => sum + drink.cost, 0)
@@ -291,7 +285,7 @@ export const getGroupMembersProgress = async (groupId: string): Promise<{ data: 
         weekly_spent: weeklySpent,
         drinks_count: drinksCount,
         is_within_budget: isWithinBudget,
-        streak_weeks: 0 // Will be calculated separately
+        streak_weeks: 0
       }
     })
 
@@ -364,7 +358,7 @@ export interface GroupDrink {
   created_at: string
 }
 
-export const getGroupRecentDrinks = async ( limit: number = 10): Promise<{ data: GroupDrink[] | null, error: Error | null }> => {
+export const getGroupRecentDrinks = async (limit: number = 10): Promise<{ data: GroupDrink[] | null, error: Error | null }> => {
   try {
     const { data, error } = await supabase
       .from('drinks')
@@ -392,7 +386,16 @@ export const getGroupRecentDrinks = async ( limit: number = 10): Promise<{ data:
     }
 
     // Transform the data to match our interface
-    const drinks: GroupDrink[] = data.map((item: DrinkQueryResult) => ({
+    const drinks: GroupDrink[] = data.map((item: {
+      id: string;
+      user_id: string;
+      type: string;
+      cost: number;
+      date: string;
+      location: string;
+      created_at: string;
+      users: { username: string } | { username: string }[];
+    }) => ({
       id: item.id,
       user_id: item.user_id,
       username: Array.isArray(item.users) ? item.users[0].username : item.users.username,

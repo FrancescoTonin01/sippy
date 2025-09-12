@@ -2,10 +2,12 @@ import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { useAuth } from '../hooks/useAuth'
 import { useObjectives } from '../hooks/useObjectives'
+import { useUserStats } from '../hooks/useUserStats'
 
 export const Profile = () => {
   const { user, signOut } = useAuth()
   const { objective, setWeeklyBudget, loading } = useObjectives()
+  const { stats, loading: statsLoading, error: statsError } = useUserStats()
   const [budgetInput, setBudgetInput] = useState(
     objective?.weekly_budget?.toString() || ''
   )
@@ -36,7 +38,7 @@ export const Profile = () => {
     }
   }
 
-  if (loading) {
+  if (loading || statsLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
@@ -138,6 +140,73 @@ export const Profile = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
+          className="bg-white rounded-2xl shadow-lg p-6 mb-6"
+        >
+          <h3 className="text-lg font-semibold text-gray-800 mb-4">
+            Le Tue Statistiche
+          </h3>
+          
+          {statsError ? (
+            <div className="text-red-500 text-sm mb-4">
+              Errore nel caricamento delle statistiche: {statsError}
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 gap-4">
+              <div className="bg-gradient-to-br from-teal-50 to-teal-100 rounded-xl p-4">
+                <div className="text-2xl mb-2">💰</div>
+                <div className="text-sm text-gray-600 mb-1">Spesa Totale</div>
+                <div className="text-lg font-bold text-teal-700">
+                  €{stats?.totalSpent.toFixed(2) || '0.00'}
+                </div>
+              </div>
+
+              <div className="bg-gradient-to-br from-orange-50 to-orange-100 rounded-xl p-4">
+                <div className="text-2xl mb-2">📊</div>
+                <div className="text-sm text-gray-600 mb-1">Media Settimanale</div>
+                <div className="text-lg font-bold text-orange-700">
+                  €{stats?.averageWeeklyCost.toFixed(2) || '0.00'}
+                </div>
+              </div>
+
+              <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-4">
+                <div className="text-2xl mb-2">🍹</div>
+                <div className="text-sm text-gray-600 mb-1">Drink Preferito</div>
+                <div className="text-sm font-bold text-purple-700 leading-tight">
+                  {stats?.favoriteDrink || 'N/A'}
+                </div>
+              </div>
+
+              <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-4">
+                <div className="text-2xl mb-2">📍</div>
+                <div className="text-sm text-gray-600 mb-1">Luogo Preferito</div>
+                <div className="text-sm font-bold text-blue-700 leading-tight">
+                  {stats?.mostFrequentLocation || 'N/A'}
+                </div>
+              </div>
+
+              <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-4">
+                <div className="text-2xl mb-2">📅</div>
+                <div className="text-sm text-gray-600 mb-1">Giorno Top</div>
+                <div className="text-sm font-bold text-green-700 leading-tight">
+                  {stats?.peakDrinkingDay || 'N/A'}
+                </div>
+              </div>
+
+              <div className="bg-gradient-to-br from-indigo-50 to-indigo-100 rounded-xl p-4">
+                <div className="text-2xl mb-2">🔢</div>
+                <div className="text-sm text-gray-600 mb-1">Drink Totali</div>
+                <div className="text-lg font-bold text-indigo-700">
+                  {stats?.totalDrinks || 0}
+                </div>
+              </div>
+            </div>
+          )}
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
           className="bg-white rounded-2xl shadow-lg p-6"
         >
           <h3 className="text-lg font-semibold text-gray-800 mb-4">

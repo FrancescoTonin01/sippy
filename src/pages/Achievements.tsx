@@ -1,28 +1,35 @@
 import { useState, useEffect, useCallback } from 'react'
 import { motion } from 'framer-motion'
 import { useAuth } from '../hooks/useAuth'
-import { getDrinks } from '../api/drinks'
+import { getUserStats } from '../api/users'
 import { getUserObjective } from '../api/objectives'
+import { getUserBadges, getBadgesByCategory, getCategoryDisplayName } from '../utils/badges'
 import { Badge } from '../components/Badge'
+import type { UserStats } from '../api/users'
 import type { Objective } from '../api/objectives'
 
 export const Achievements = () => {
   const { user } = useAuth()
-  const [totalDrinks, setTotalDrinks] = useState(0)
+  const [stats, setStats] = useState<UserStats | null>(null)
   const [objective, setObjective] = useState<Objective | null>(null)
+  const [badges, setBadges] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
 
   const loadAchievementData = useCallback(async () => {
     if (!user) return
 
     try {
-      const [drinksResult, objectiveResult] = await Promise.all([
-        getDrinks(user.id),
+      const [statsResult, objectiveResult] = await Promise.all([
+        getUserStats(user.id),
         getUserObjective(user.id)
       ])
 
-      if (drinksResult.data) {
-        setTotalDrinks(drinksResult.data.length)
+      if (statsResult.data) {
+        setStats(statsResult.data)
+        // Calculate badges using the new system
+        const hasObjective = !!objectiveResult.data
+        const userBadges = getUserBadges(statsResult.data, hasObjective)
+        setBadges(userBadges)
       }
 
       if (objectiveResult.data) {
@@ -39,48 +46,8 @@ export const Achievements = () => {
     loadAchievementData()
   }, [loadAchievementData])
 
-  const badges = [
-    {
-      id: 'first-drink',
-      title: 'Primo Sorso',
-      description: 'Registra il tuo primo drink',
-      icon: '🥃',
-      unlocked: totalDrinks >= 1,
-      requirement: 1
-    },
-    {
-      id: 'ten-drinks',
-      title: 'Decina Dorata',
-      description: 'Registra 10 drink in totale',
-      icon: '🏆',
-      unlocked: totalDrinks >= 10,
-      requirement: 10
-    },
-    {
-      id: 'fifty-drinks',
-      title: 'Mezzo Secolo',
-      description: 'Registra 50 drink in totale',
-      icon: '🎉',
-      unlocked: totalDrinks >= 50,
-      requirement: 50
-    },
-    {
-      id: 'hundred-drinks',
-      title: 'Centuria',
-      description: 'Registra 100 drink in totale',
-      icon: '💯',
-      unlocked: totalDrinks >= 100,
-      requirement: 100
-    },
-    {
-      id: 'goal-setter',
-      title: 'Obiettivi Chiari',
-      description: 'Imposta il tuo primo obiettivo settimanale',
-      icon: '🎯',
-      unlocked: !!objective,
-      requirement: 'Imposta obiettivo'
-    }
-  ]
+  const unlockedBadges = badges.filter(badge => badge.unlocked)
+  const badgesByCategory = stats ? getBadgesByCategory(stats, !!objective) : null
 
   if (loading) {
     return (
@@ -92,9 +59,6 @@ export const Achievements = () => {
       </div>
     )
   }
-
-  const unlockedBadges = badges.filter(badge => badge.unlocked)
-  const lockedBadges = badges.filter(badge => !badge.unlocked)
 
   return (
     <div className="min-h-screen bg-gray-50 p-4 pb-20">
@@ -110,7 +74,7 @@ export const Achievements = () => {
           
           <div className="grid grid-cols-3 gap-4 mb-6">
             <div className="text-center">
-              <div className="text-2xl font-bold text-teal-600">{totalDrinks}</div>
+              <div className="text-2xl font-bold text-teal-600">{stats?.totalDrinks || 0}</div>
               <div className="text-sm text-gray-600">Drink totali</div>
             </div>
             <div className="text-center">
@@ -118,55 +82,115 @@ export const Achievements = () => {
               <div className="text-sm text-gray-600">Badge sbloccati</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-gray-600">{objective?.weekly_goal || '-'}</div>
-              <div className="text-sm text-gray-600">Obiettivo settimanale</div>
+              <div className="text-2xl font-bold text-gray-600">{objective?.weekly_budget || '-'}€</div>
+              <div className="text-sm text-gray-600">Spesa massima settimanale</div>
             </div>
           </div>
+
+          {/* Additional stats */}
+          {stats && (
+            <div className="grid grid-cols-2 gap-4 pt-4 border-t border-gray-100">
+              <div className="text-center">
+                <div className="text-lg font-semibold text-teal-600">€{stats.totalSpent.toFixed(2)}</div>
+                <div className="text-xs text-gray-500">Spesa totale</div>
+              </div>
+              <div className="text-center">
+                <div className="text-lg font-semibold text-orange-600">{stats.groupsCount}</div>
+                <div className="text-xs text-gray-500">Gruppi</div>
+              </div>
+              <div className="text-center">
+                <div className="text-lg font-semibold text-green-600">{stats.achievedWeeklyGoals}</div>
+                <div className="text-xs text-gray-500">Obiettivi raggiunti</div>
+              </div>
+              <div className="text-center">
+                <div className="text-lg font-semibold text-red-600">{stats.maxStreakWeeks}</div>
+                <div className="text-xs text-gray-500">Record streak</div>
+              </div>
+            </div>
+          )}
         </motion.div>
 
-        {unlockedBadges.length > 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="bg-white rounded-2xl shadow-lg p-6 mb-6"
-          >
-            <h2 className="text-lg font-semibold text-gray-800 mb-4">
-              Badge Sbloccati ✨
-            </h2>
-            
-            <div className="space-y-3">
-              {unlockedBadges.map((badge, index) => (
-                <Badge
-                  key={badge.id}
-                  badge={badge}
-                  delay={index * 0.1}
-                />
-              ))}
-            </div>
-          </motion.div>
-        )}
+        {/* Badge categories */}
+        {badgesByCategory && Object.entries(badgesByCategory).map(([categoryKey, categoryBadges], categoryIndex) => {
+          const unlockedInCategory = categoryBadges.filter((b: any) => b.unlocked)
+          const lockedInCategory = categoryBadges.filter((b: any) => !b.unlocked)
+          
+          if (categoryBadges.length === 0) return null
 
-        {lockedBadges.length > 0 && (
+          return (
+            <motion.div
+              key={categoryKey}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 + categoryIndex * 0.1 }}
+              className="bg-white rounded-2xl shadow-lg p-6 mb-6"
+            >
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg font-semibold text-gray-800">
+                  {getCategoryDisplayName(categoryKey)}
+                </h2>
+                <span className="text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
+                  {unlockedInCategory.length}/{categoryBadges.length}
+                </span>
+              </div>
+
+              {/* Unlocked badges in this category */}
+              {unlockedInCategory.length > 0 && (
+                <div className="mb-6">
+                  <h3 className="text-sm font-medium text-green-700 mb-3 flex items-center">
+                    <span className="mr-2">✨</span>
+                    Sbloccati ({unlockedInCategory.length})
+                  </h3>
+                  <div className="space-y-3">
+                    {unlockedInCategory.map((badge: any, index: number) => (
+                      <Badge key={badge.id} badge={badge} delay={index * 0.05} />
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Locked badges in this category */}
+              {lockedInCategory.length > 0 && (
+                <div>
+                  <h3 className="text-sm font-medium text-gray-600 mb-3 flex items-center">
+                    <span className="mr-2">🔒</span>
+                    Da sbloccare ({lockedInCategory.length})
+                  </h3>
+                  <div className="space-y-3">
+                    {lockedInCategory.slice(0, 3).map((badge: any, index: number) => (
+                      <Badge key={badge.id} badge={badge} delay={index * 0.05} />
+                    ))}
+                    {lockedInCategory.length > 3 && (
+                      <div className="text-center py-3 bg-gray-50 rounded-lg">
+                        <p className="text-sm text-gray-500">
+                          +{lockedInCategory.length - 3} altri badge da sbloccare
+                        </p>
+                        <p className="text-xs text-gray-400 mt-1">
+                          Continua a raggiungere obiettivi per vederli tutti!
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+            </motion.div>
+          )
+        })}
+
+        {badges.length === 0 && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="bg-white rounded-2xl shadow-lg p-6"
+            className="bg-white rounded-2xl shadow-lg p-8 text-center"
           >
-            <h2 className="text-lg font-semibold text-gray-800 mb-4">
-              Da Sbloccare 🔒
+            <div className="text-4xl mb-4">🏅</div>
+            <h2 className="text-lg font-semibold text-gray-800 mb-2">
+              Nessun badge disponibile
             </h2>
-            
-            <div className="space-y-3">
-              {lockedBadges.map((badge, index) => (
-                <Badge
-                  key={badge.id}
-                  badge={badge}
-                  delay={index * 0.1}
-                />
-              ))}
-            </div>
+            <p className="text-gray-600">
+              Inizia a registrare i tuoi drink per sbloccare i primi badge!
+            </p>
           </motion.div>
         )}
       </div>

@@ -6,9 +6,10 @@ interface UserProgressCardProps {
   member: GroupMemberProgress
   groupBudget: number
   isCurrentUser?: boolean
+  onClick?: (userId: string, username: string) => void
 }
 
-export const UserProgressCard = ({ member, groupBudget, isCurrentUser }: UserProgressCardProps) => {
+export const UserProgressCard = ({ member, groupBudget, isCurrentUser, onClick }: UserProgressCardProps) => {
   const remainingBudget = Math.max(0, groupBudget - member.weekly_spent)
   const progress = groupBudget > 0 ? (remainingBudget / groupBudget) * 100 : 100
   
@@ -30,11 +31,20 @@ export const UserProgressCard = ({ member, groupBudget, isCurrentUser }: UserPro
     return 'bg-white'
   }
 
+  const handleClick = () => {
+    if (onClick && !isCurrentUser) {
+      onClick(member.user_id, member.username)
+    }
+  }
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className={`border-2 ${getBorderColor()} ${getBackgroundColor()} rounded-xl p-4 shadow-sm`}
+      onClick={handleClick}
+      className={`border-2 ${getBorderColor()} ${getBackgroundColor()} rounded-xl p-4 shadow-sm ${
+        onClick && !isCurrentUser ? 'cursor-pointer hover:shadow-md transition-shadow' : ''
+      }`}
     >
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-3">

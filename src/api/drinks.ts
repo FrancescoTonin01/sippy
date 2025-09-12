@@ -81,3 +81,7 @@ export const getWeeklyDrinks = async (userId: string) => {
     endOfWeek.toISOString().split('T')[0]
   )
 }
+
+export const getAllUserDrinks = async (userId: string) => {
+  return getDrinks(userId)
+}

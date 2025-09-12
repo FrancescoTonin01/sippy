@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useUserSearch } from '../hooks/useGroups'
+import { useAuth } from '../hooks/useAuth'
 
 interface InviteUserModalProps {
   isOpen: boolean
@@ -9,10 +10,11 @@ interface InviteUserModalProps {
 }
 
 export const InviteUserModal = ({ isOpen, onClose, onInvite }: InviteUserModalProps) => {
+  const { user } = useAuth()
   const [query, setQuery] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
-  const { users, search, loading: searchLoading } = useUserSearch()
+  const { users, search, loading: searchLoading } = useUserSearch(user?.id)
 
   useEffect(() => {
     if (query.trim().length >= 2) {

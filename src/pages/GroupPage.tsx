@@ -2,12 +2,13 @@ import { useState, useEffect, useCallback } from 'react'
 import { useParams } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { useAuth } from '../hooks/useAuth'
-import { getGroupMembersProgress, calculateUserStreak, updateGroupBudget, getGroupRecentDrinks } from '../api/groups'
+import { getGroupMembersProgress, updateGroupBudget, getGroupRecentDrinks } from '../api/groups'
 import { getGroupLeaderboard } from '../api/functions'
 import { UserProgressCard } from '../components/UserProgressCard'
 import { Leaderboard } from '../components/Leaderboard'
 import { GroupBudgetModal } from '../components/GroupBudgetModal'
 import { GroupDrinkHistory } from '../components/GroupDrinkHistory'
+import { UserProfileModal } from '../components/UserProfileModal'
 import type { GroupMemberProgress, Group, GroupDrink } from '../api/groups'
 import type { LeaderboardEntry } from '../api/functions'
 import { supabase } from '../utils/supabase'
@@ -18,10 +19,13 @@ export const GroupPage = () => {
   const [group, setGroup] = useState<Group | null>(null)
   const [membersProgress, setMembersProgress] = useState<GroupMemberProgress[]>([])
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([])
+  const [leaderboardError, setLeaderboardError] = useState<string | null>(null)
   const [recentDrinks, setRecentDrinks] = useState<GroupDrink[]>([])
   const [loading, setLoading] = useState(true)
   const [refreshing, setRefreshing] = useState(false)
   const [showBudgetModal, setShowBudgetModal] = useState(false)
+  const [showUserProfile, setShowUserProfile] = useState(false)
+  const [selectedUser, setSelectedUser] = useState<{ id: string; username: string } | null>(null)
   const [activeTab, setActiveTab] = useState<'progress' | 'leaderboard' | 'drinks'>('progress')
   const [lastUpdate, setLastUpdate] = useState<Date | null>(null)
 
@@ -46,19 +50,16 @@ export const GroupPage = () => {
       const { data: progressData } = await getGroupMembersProgress(groupId)
       
       if (progressData) {
-        // Calculate streaks for each member
-        const progressWithStreaks = await Promise.all(
-          progressData.map(async (member) => {
-            const streak = await calculateUserStreak(member.user_id, groupId)
-            return { ...member, streak_weeks: streak }
-          })
-        )
-        setMembersProgress(progressWithStreaks)
+        setMembersProgress(progressData)
       }
 
       // Get leaderboard for the toggle view
-      const { data: leaderboardData } = await getGroupLeaderboard(groupId)
-      if (leaderboardData) {
+      setLeaderboardError(null)
+      const { data: leaderboardData, error: leaderboardErr } = await getGroupLeaderboard(groupId)
+      if (leaderboardErr) {
+        setLeaderboardError('Errore nel caricamento della classifica')
+        setLeaderboard([])
+      } else if (leaderboardData) {
         setLeaderboard(leaderboardData)
       }
 
@@ -105,13 +106,13 @@ export const GroupPage = () => {
     loadGroupData()
   }, [loadGroupData])
 
-  // Auto-refresh every 30 seconds when page is visible
+  // Auto-refresh every 2 minutes when page is visible
   useEffect(() => {
     const interval = setInterval(() => {
       if (document.visibilityState === 'visible') {
         loadGroupData()
       }
-    }, 30000)
+    }, 120000)
 
     return () => clearInterval(interval)
   }, [loadGroupData])
@@ -131,6 +132,16 @@ export const GroupPage = () => {
   const handleManualRefresh = () => {
     setRefreshing(true)
     loadGroupData()
+  }
+
+  const handleUserClick = (userId: string, username: string) => {
+    setSelectedUser({ id: userId, username })
+    setShowUserProfile(true)
+  }
+
+  const handleCloseUserProfile = () => {
+    setShowUserProfile(false)
+    setSelectedUser(null)
   }
 
   if (loading) {
@@ -250,10 +261,28 @@ export const GroupPage = () => {
             animate={{ opacity: 1, y: 0 }}
             className="bg-white rounded-2xl shadow-lg p-6"
           >
-            <h2 className="text-lg font-semibold text-gray-800 mb-4">
-              🏆 Classifica Settimanale
-            </h2>
-            <Leaderboard data={leaderboard} currentUserId={user?.id} />
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-semibold text-gray-800">
+                🏆 Classifica Settimanale
+              </h2>
+              {refreshing && (
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-teal-600"></div>
+              )}
+            </div>
+            
+            {leaderboardError ? (
+              <div className="bg-red-50 border border-red-200 rounded-xl p-4 text-center">
+                <p className="text-red-800 font-medium">❌ {leaderboardError}</p>
+                <button 
+                  onClick={handleManualRefresh}
+                  className="text-red-600 hover:text-red-700 text-sm font-medium mt-2 hover:underline"
+                >
+                  Riprova
+                </button>
+              </div>
+            ) : (
+              <Leaderboard data={leaderboard} currentUserId={user?.id} />
+            )}
           </motion.div>
         )}
 
@@ -293,6 +322,7 @@ export const GroupPage = () => {
                 member={member}
                 groupBudget={groupBudget}
                 isCurrentUser={member.user_id === user?.id}
+                onClick={handleUserClick}
               />
             ))}
           </div>
@@ -314,6 +344,15 @@ export const GroupPage = () => {
         currentBudget={groupBudget}
         groupName={group.name}
       />
+
+      {selectedUser && (
+        <UserProfileModal
+          isOpen={showUserProfile}
+          onClose={handleCloseUserProfile}
+          userId={selectedUser.id}
+          username={selectedUser.username}
+        />
+      )}
     </div>
   )
 }

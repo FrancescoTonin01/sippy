@@ -137,7 +137,7 @@ export const useGroupMembers = (groupId: string) => {
   }
 }
 
-export const useUserSearch = () => {
+export const useUserSearch = (excludeUserId?: string) => {
   const [users, setUsers] = useState<Member[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -147,7 +147,7 @@ export const useUserSearch = () => {
     setError(null)
 
     try {
-      const { data, error: searchError } = await searchUsers(query)
+      const { data, error: searchError } = await searchUsers(query, excludeUserId)
       
       if (searchError) {
         setError(searchError.message)

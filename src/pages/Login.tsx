@@ -12,6 +12,12 @@ export const Login = () => {
   const [username, setUsername] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [passwordValidation, setPasswordValidation] = useState({
+    length: false,
+    uppercase: false,
+    lowercase: false,
+    number: false
+  })
 
   // Redirect se già loggato
   useEffect(() => {
@@ -19,6 +25,23 @@ export const Login = () => {
       navigate('/dashboard', { replace: true })
     }
   }, [user, navigate])
+
+  // Validazione password real-time per signup
+  const validatePassword = (password: string) => {
+    const validation = {
+      length: password.length >= 6,
+      uppercase: /[A-Z]/.test(password),
+      lowercase: /[a-z]/.test(password),
+      number: /\d/.test(password)
+    }
+    setPasswordValidation(validation)
+    return validation
+  }
+
+  const isPasswordValid = (password: string) => {
+    const validation = validatePassword(password)
+    return validation.length && validation.uppercase && validation.lowercase && validation.number
+  }
 
   const getErrorMessage = (error: { message?: string }) => {
     if (!error?.message) return 'Errore imprevisto'
@@ -65,7 +88,12 @@ export const Login = () => {
       setLoading(false)
       return
     }
-    if (password.length < 6) {
+    if (!isLogin && !isPasswordValid(password)) {
+      setError('Password non conforme ai requisiti di sicurezza')
+      setLoading(false)
+      return
+    }
+    if (isLogin && password.length < 6) {
       setError('Password deve avere almeno 6 caratteri')
       setLoading(false)
       return
@@ -144,11 +172,39 @@ export const Login = () => {
             <input
               type="password"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={(e) => {
+                setPassword(e.target.value)
+                if (!isLogin) {
+                  validatePassword(e.target.value)
+                }
+              }}
               required
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
               placeholder="••••••••"
             />
+            {!isLogin && password && (
+              <div className="mt-3 space-y-2">
+                <p className="text-sm font-medium text-gray-700">Requisiti password:</p>
+                <div className="space-y-1">
+                  <div className={`text-xs flex items-center gap-2 ${passwordValidation.length ? 'text-green-600' : 'text-gray-400'}`}>
+                    <span>{passwordValidation.length ? '✓' : '○'}</span>
+                    Almeno 6 caratteri
+                  </div>
+                  <div className={`text-xs flex items-center gap-2 ${passwordValidation.uppercase ? 'text-green-600' : 'text-gray-400'}`}>
+                    <span>{passwordValidation.uppercase ? '✓' : '○'}</span>
+                    Una lettera maiuscola (A-Z)
+                  </div>
+                  <div className={`text-xs flex items-center gap-2 ${passwordValidation.lowercase ? 'text-green-600' : 'text-gray-400'}`}>
+                    <span>{passwordValidation.lowercase ? '✓' : '○'}</span>
+                    Una lettera minuscola (a-z)
+                  </div>
+                  <div className={`text-xs flex items-center gap-2 ${passwordValidation.number ? 'text-green-600' : 'text-gray-400'}`}>
+                    <span>{passwordValidation.number ? '✓' : '○'}</span>
+                    Un numero (0-9)
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
 
           {error && (

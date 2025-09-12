@@ -13,6 +13,9 @@ interface LeaderboardProps {
 }
 
 export const Leaderboard = ({ data, currentUserId }: LeaderboardProps) => {
+  // Sort data by drink count descending
+  const sortedData = [...data].sort((a, b) => b.drink_count - a.drink_count)
+
   const getRankIcon = (index: number) => {
     switch (index) {
       case 0: return '🥇'
@@ -44,7 +47,7 @@ export const Leaderboard = ({ data, currentUserId }: LeaderboardProps) => {
 
   return (
     <div className="space-y-3">
-      {data.map((entry, index) => (
+      {sortedData.map((entry, index) => (
         <motion.div
           key={entry.user_id}
           initial={{ opacity: 0, x: -20 }}
@@ -66,14 +69,27 @@ export const Leaderboard = ({ data, currentUserId }: LeaderboardProps) => {
                 {entry.username}
               </span>
               {entry.user_id === currentUserId && (
-                <span className="text-xs bg-teal-100 text-teal-800 px-2 py-1 rounded-full">
+                <span className="text-xs bg-teal-100 text-teal-800 px-2 py-1 rounded-full font-medium">
                   Tu
                 </span>
               )}
+              {index === 0 && entry.drink_count > 0 && (
+                <span className="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full font-medium">
+                  Leader
+                </span>
+              )}
             </div>
-            <p className="text-sm text-gray-600">
-              {entry.drink_count} drink • €{entry.total_cost.toFixed(2)}
-            </p>
+            <div className="flex items-center gap-3 text-sm text-gray-600">
+              <span>{entry.drink_count} drink</span>
+              <span>•</span>
+              <span>€{entry.total_cost.toFixed(2)} spesi</span>
+              {entry.drink_count > 0 && (
+                <>
+                  <span>•</span>
+                  <span>€{(entry.total_cost / entry.drink_count).toFixed(2)} media</span>
+                </>
+              )}
+            </div>
           </div>
 
           <div className="text-right">
@@ -81,6 +97,9 @@ export const Leaderboard = ({ data, currentUserId }: LeaderboardProps) => {
               {entry.drink_count}
             </div>
             <div className="text-xs text-gray-500">drink</div>
+            <div className="text-xs text-gray-500 mt-1">
+              €{entry.total_cost.toFixed(0)}
+            </div>
           </div>
         </motion.div>
       ))}
