@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useAuth } from './useAuth'
-import { getGroups, createGroup, getGroupMembers, searchUsers, inviteToGroup, removeFromGroup } from '../api/groups'
+import { getGroups, createGroup, getGroupMembers, searchUsers, inviteToGroup, removeFromGroup, leaveGroup, deleteGroup } from '../api/groups'
 import type { Group, CreateGroupData, Member } from '../api/groups'
 
 export const useGroups = () => {
@@ -50,6 +50,40 @@ export const useGroups = () => {
     }
   }
 
+  const leaveGroupFn = async (groupId: string) => {
+    if (!user) return { success: false, error: 'Utente non autenticato' }
+
+    try {
+      const { error: leaveError } = await leaveGroup(user.id, groupId)
+      
+      if (leaveError) {
+        return { success: false, error: leaveError.message }
+      }
+
+      setGroups(groups.filter(group => group.id !== groupId))
+      return { success: true }
+    } catch {
+      return { success: false, error: 'Errore nell\'uscita dal gruppo' }
+    }
+  }
+
+  const removeGroup = async (groupId: string) => {
+    if (!user) return { success: false, error: 'Utente non autenticato' }
+
+    try {
+      const { error: deleteError } = await deleteGroup(user.id, groupId)
+      
+      if (deleteError) {
+        return { success: false, error: deleteError.message }
+      }
+
+      setGroups(groups.filter(group => group.id !== groupId))
+      return { success: true }
+    } catch {
+      return { success: false, error: 'Errore nell\'eliminazione del gruppo' }
+    }
+  }
+
   useEffect(() => {
     if (user) {
       fetchGroups()
@@ -61,7 +95,9 @@ export const useGroups = () => {
     loading,
     error,
     fetchGroups,
-    addGroup
+    addGroup,
+    leaveGroup: leaveGroupFn,
+    removeGroup
   }
 }
 

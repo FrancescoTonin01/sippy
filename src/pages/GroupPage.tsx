@@ -1,7 +1,8 @@
 import { useState, useEffect, useCallback } from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { useAuth } from '../hooks/useAuth'
+import { useGroups } from '../hooks/useGroups'
 import { updateGroupBudget, getGroupRecentDrinks } from '../api/groups'
 import { getGroupCompleteData, type LeaderboardEntry } from '../api/groupsOptimized'
 import { UserProgressCard } from '../components/UserProgressCard'
@@ -15,6 +16,8 @@ import type { GroupMemberProgress, Group, GroupDrink } from '../api/groups'
 export const GroupPage = () => {
   const { groupId } = useParams()
   const { user } = useAuth()
+  const navigate = useNavigate()
+  const { leaveGroup, removeGroup } = useGroups()
   const [group, setGroup] = useState<Group | null>(null)
   const [membersProgress, setMembersProgress] = useState<GroupMemberProgress[]>([])
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([])
@@ -145,9 +148,42 @@ export const GroupPage = () => {
     setSelectedUser(null)
   }
 
+  const handleLeaveGroup = async () => {
+    if (!groupId || !group) return
+
+    const isOwner = group.owner_id === user?.id
+    let message = 'Sei sicuro di voler uscire da questo gruppo?'
+    
+    if (isOwner) {
+      message = 'Sei il proprietario di questo gruppo. Se esci, la proprietà verrà trasferita al membro più anziano. Continuare?'
+    }
+
+    if (window.confirm(message)) {
+      const result = await leaveGroup(groupId)
+      if (result.success) {
+        navigate('/groups')
+      } else {
+        alert(`Errore: ${result.error}`)
+      }
+    }
+  }
+
+  const handleDeleteGroup = async () => {
+    if (!groupId || !group) return
+
+    if (window.confirm('Sei sicuro di voler eliminare questo gruppo? Questa azione non può essere annullata e tutti i dati del gruppo verranno persi.')) {
+      const result = await removeGroup(groupId)
+      if (result.success) {
+        navigate('/groups')
+      } else {
+        alert(`Errore: ${result.error}`)
+      }
+    }
+  }
+
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 p-4 pb-20">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-4 pb-20">
         <div className="max-w-md mx-auto">
           <GroupHeaderSkeleton />
           <div className="space-y-4">
@@ -162,9 +198,9 @@ export const GroupPage = () => {
 
   if (!group) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
         <div className="text-center">
-          <p className="text-gray-600">Gruppo non trovato</p>
+          <p className="text-gray-600 dark:text-gray-300">Gruppo non trovato</p>
         </div>
       </div>
     )
@@ -174,48 +210,65 @@ export const GroupPage = () => {
   const isOwner = group.owner_id === user?.id
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4 pb-20">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-4 pb-20">
       <div className="max-w-md mx-auto">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-white rounded-2xl shadow-lg p-6 mb-6"
+          className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 mb-6"
         >
           <div className="flex items-center justify-between mb-2">
-            <h1 className="text-2xl font-bold text-gray-800">
+            <h1 className="text-2xl font-bold text-gray-800 dark:text-white">
               {group.name}
             </h1>
             <div className="flex items-center gap-2">
               <button
                 onClick={handleManualRefresh}
                 disabled={refreshing}
-                className="text-gray-600 hover:text-gray-700 text-sm hover:bg-gray-50 p-2 rounded-lg transition-colors disabled:opacity-50"
+                className="text-gray-600 dark:text-gray-300 hover:text-gray-700 dark:hover:text-gray-200 text-sm hover:bg-gray-50 dark:hover:bg-gray-700 p-2 rounded-lg transition-colors disabled:opacity-50"
                 title="Aggiorna dati"
               >
                 <span className={`text-lg ${refreshing ? 'animate-spin' : ''}`}>
                   🔄
                 </span>
               </button>
-              {isOwner && (
+              {isOwner ? (
+                <>
+                  <button
+                    onClick={() => setShowBudgetModal(true)}
+                    className="text-teal-600 dark:text-teal-400 hover:text-teal-700 dark:hover:text-teal-300 text-sm font-medium hover:bg-teal-50 dark:hover:bg-teal-900 px-3 py-1 rounded-lg transition-colors"
+                  >
+                    ⚙️ Obiettivo
+                  </button>
+                  <button
+                    onClick={handleDeleteGroup}
+                    className="text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 text-sm font-medium hover:bg-red-50 dark:hover:bg-red-900 px-3 py-1 rounded-lg transition-colors"
+                    title="Elimina gruppo"
+                  >
+                    🗑️ Elimina
+                  </button>
+                </>
+              ) : (
                 <button
-                  onClick={() => setShowBudgetModal(true)}
-                  className="text-teal-600 hover:text-teal-700 text-sm font-medium hover:bg-teal-50 px-3 py-1 rounded-lg transition-colors"
+                  onClick={handleLeaveGroup}
+                  className="text-orange-600 dark:text-orange-400 hover:text-orange-700 dark:hover:text-orange-300 text-sm font-medium hover:bg-orange-50 dark:hover:bg-orange-900 px-3 py-1 rounded-lg transition-colors"
+                  title="Esci dal gruppo"
                 >
-                  ⚙️ Obiettivo
+                  🚪 Esci
                 </button>
               )}
             </div>
           </div>
           <div className="mb-4">
-            <p className="text-gray-600 mb-1">
+            <p className="text-gray-600 dark:text-gray-300 mb-1">
               {groupBudget > 0 
                 ? `Obiettivo settimanale: €${groupBudget.toFixed(2)}`
                 : 'Nessun obiettivo impostato'
               }
             </p>
             {lastUpdate && (
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-gray-500 dark:text-gray-400">
                 Ultimo aggiornamento: {lastUpdate.toLocaleTimeString('it-IT', { 
                   hour: '2-digit', 
                   minute: '2-digit' 
@@ -225,13 +278,13 @@ export const GroupPage = () => {
           </div>
 
           {/* Tab Navigation */}
-          <div className="flex bg-gray-100 rounded-lg p-1">
+          <div className="flex bg-gray-100 dark:bg-gray-700 rounded-lg p-1">
             <button
               onClick={() => setActiveTab('progress')}
               className={`flex-1 py-2 px-2 rounded-md text-xs font-medium transition-colors ${
                 activeTab === 'progress'
-                  ? 'bg-white text-teal-600 shadow-sm'
-                  : 'text-gray-600'
+                  ? 'bg-white dark:bg-gray-800 text-teal-600 dark:text-teal-400 shadow-sm'
+                  : 'text-gray-600 dark:text-gray-300'
               }`}
             >
               📊 Progresso
@@ -240,8 +293,8 @@ export const GroupPage = () => {
               onClick={() => setActiveTab('leaderboard')}
               className={`flex-1 py-2 px-2 rounded-md text-xs font-medium transition-colors ${
                 activeTab === 'leaderboard'
-                  ? 'bg-white text-teal-600 shadow-sm'
-                  : 'text-gray-600'
+                  ? 'bg-white dark:bg-gray-800 text-teal-600 dark:text-teal-400 shadow-sm'
+                  : 'text-gray-600 dark:text-gray-300'
               }`}
             >
               🏆 Classifica
@@ -250,8 +303,8 @@ export const GroupPage = () => {
               onClick={() => setActiveTab('drinks')}
               className={`flex-1 py-2 px-2 rounded-md text-xs font-medium transition-colors ${
                 activeTab === 'drinks'
-                  ? 'bg-white text-teal-600 shadow-sm'
-                  : 'text-gray-600'
+                  ? 'bg-white dark:bg-gray-800 text-teal-600 dark:text-teal-400 shadow-sm'
+                  : 'text-gray-600 dark:text-gray-300'
               }`}
             >
               🍻 Attività
@@ -264,10 +317,10 @@ export const GroupPage = () => {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-white rounded-2xl shadow-lg p-6"
+            className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6"
           >
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold text-gray-800">
+              <h2 className="text-lg font-semibold text-gray-800 dark:text-white">
                 🏆 Classifica Settimanale
               </h2>
               {refreshing && (
@@ -278,11 +331,11 @@ export const GroupPage = () => {
             {tabLoading['leaderboard'] ? (
               <LeaderboardSkeleton />
             ) : leaderboardError ? (
-              <div className="bg-red-50 border border-red-200 rounded-xl p-4 text-center">
-                <p className="text-red-800 font-medium">❌ {leaderboardError}</p>
+              <div className="bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-700 rounded-xl p-4 text-center">
+                <p className="text-red-800 dark:text-red-300 font-medium">❌ {leaderboardError}</p>
                 <button 
                   onClick={handleManualRefresh}
-                  className="text-red-600 hover:text-red-700 text-sm font-medium mt-2 hover:underline"
+                  className="text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 text-sm font-medium mt-2 hover:underline"
                 >
                   Riprova
                 </button>
@@ -299,12 +352,12 @@ export const GroupPage = () => {
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="bg-yellow-50 border border-yellow-200 rounded-xl p-4 text-center"
+                className="bg-yellow-50 dark:bg-yellow-900/30 border border-yellow-200 dark:border-yellow-700 rounded-xl p-4 text-center"
               >
-                <p className="text-yellow-800 font-medium">
+                <p className="text-yellow-800 dark:text-yellow-300 font-medium">
                   ⚠️ Nessun obiettivo gruppo impostato
                 </p>
-                <p className="text-yellow-700 text-sm mt-1">
+                <p className="text-yellow-700 dark:text-yellow-400 text-sm mt-1">
                   Il proprietario del gruppo deve impostare un budget settimanale
                 </p>
               </motion.div>
@@ -312,12 +365,12 @@ export const GroupPage = () => {
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="bg-blue-50 border border-blue-200 rounded-xl p-4 text-center"
+                className="bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-700 rounded-xl p-4 text-center"
               >
-                <p className="text-blue-800 font-medium">
+                <p className="text-blue-800 dark:text-blue-300 font-medium">
                   🎯 Obiettivo gruppo: €{groupBudget.toFixed(2)} a settimana
                 </p>
-                <p className="text-blue-700 text-sm mt-1">
+                <p className="text-blue-700 dark:text-blue-400 text-sm mt-1">
                   Mantieniti sotto questo limite per rimanere in streak! 🔥
                 </p>
               </motion.div>

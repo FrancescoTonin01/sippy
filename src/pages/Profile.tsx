@@ -3,11 +3,13 @@ import { motion } from 'framer-motion'
 import { useAuth } from '../hooks/useAuth'
 import { useObjectives } from '../hooks/useObjectives'
 import { useUserStats } from '../hooks/useUserStats'
+import { useTheme } from '../context/ThemeContext'
 
 export const Profile = () => {
   const { user, signOut } = useAuth()
   const { objective, setWeeklyBudget, loading } = useObjectives()
   const { stats, loading: statsLoading, error: statsError } = useUserStats()
+  const { theme, toggleTheme } = useTheme()
   const [budgetInput, setBudgetInput] = useState(
     objective?.weekly_budget?.toString() || ''
   )
@@ -40,50 +42,50 @@ export const Profile = () => {
 
   if (loading || statsLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Caricamento...</p>
+          <p className="text-gray-600 dark:text-gray-300">Caricamento...</p>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4 pb-20">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-4 pb-20">
       <div className="max-w-md mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-white rounded-2xl shadow-lg p-6 mb-6"
+          className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 mb-6"
         >
-          <h1 className="text-2xl font-bold text-gray-800 mb-6">
+          <h1 className="text-2xl font-bold text-gray-800 dark:text-white mb-6">
             Profilo
           </h1>
           
           <div className="flex items-center gap-4 mb-6">
-            <div className="w-16 h-16 bg-teal-100 rounded-full flex items-center justify-center">
+            <div className="w-16 h-16 bg-teal-100 dark:bg-teal-900 rounded-full flex items-center justify-center">
               <span className="text-2xl">👤</span>
             </div>
             <div>
-              <h2 className="text-lg font-semibold text-gray-800">
+              <h2 className="text-lg font-semibold text-gray-800 dark:text-white">
                 {user?.user_metadata?.username || 'Utente'}
               </h2>
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-gray-600 dark:text-gray-300">
                 {user?.email}
               </p>
             </div>
           </div>
 
-          <div className="border-t pt-6">
-            <h3 className="text-lg font-semibold text-gray-800 mb-4">
+          <div className="border-t dark:border-gray-700 pt-6">
+            <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">
               Budget Settimanale
             </h3>
             
             <div className="space-y-4">
               <div className="flex justify-between items-center">
-                <span className="text-gray-700">Budget attuale:</span>
-                <span className="font-medium text-teal-600">
+                <span className="text-gray-700 dark:text-gray-300">Budget attuale:</span>
+                <span className="font-medium text-teal-600 dark:text-teal-400">
                   €{objective?.weekly_budget?.toFixed(2) || '0.00'}
                 </span>
               </div>
@@ -91,7 +93,7 @@ export const Profile = () => {
               {isEditing ? (
                 <div className="space-y-3">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                       Nuovo budget (€)
                     </label>
                     <input
@@ -100,7 +102,7 @@ export const Profile = () => {
                       step="0.01"
                       value={budgetInput}
                       onChange={(e) => setBudgetInput(e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
                       placeholder="es. 50.00"
                     />
                   </div>
@@ -118,7 +120,7 @@ export const Profile = () => {
                         setIsEditing(false)
                         setBudgetInput(objective?.weekly_budget?.toString() || '')
                       }}
-                      className="flex-1 bg-gray-200 text-gray-700 py-2 rounded-lg font-medium hover:bg-gray-300 transition-colors"
+                      className="flex-1 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-300 py-2 rounded-lg font-medium hover:bg-gray-300 dark:hover:bg-gray-500 transition-colors"
                     >
                       Annulla
                     </button>
@@ -127,7 +129,7 @@ export const Profile = () => {
               ) : (
                 <button
                   onClick={() => setIsEditing(true)}
-                  className="w-full bg-gray-100 text-gray-700 py-2 rounded-lg font-medium hover:bg-gray-200 transition-colors"
+                  className="w-full bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 py-2 rounded-lg font-medium hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
                 >
                   Modifica Budget
                 </button>
@@ -140,14 +142,14 @@ export const Profile = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="bg-white rounded-2xl shadow-lg p-6 mb-6"
+          className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 mb-6"
         >
-          <h3 className="text-lg font-semibold text-gray-800 mb-4">
+          <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">
             Le Tue Statistiche
           </h3>
           
           {statsError ? (
-            <div className="text-red-500 text-sm mb-4">
+            <div className="text-red-500 dark:text-red-400 text-sm mb-4">
               Errore nel caricamento delle statistiche: {statsError}
             </div>
           ) : (
@@ -207,13 +209,31 @@ export const Profile = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="bg-white rounded-2xl shadow-lg p-6"
+          className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6"
         >
-          <h3 className="text-lg font-semibold text-gray-800 mb-4">
+          <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">
             Impostazioni
           </h3>
           
           <div className="space-y-3">
+            <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+              <div className="flex items-center gap-3">
+                <span className="text-2xl">{theme === 'dark' ? '🌙' : '☀️'}</span>
+                <div>
+                  <p className="font-medium text-gray-800 dark:text-white">Tema</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-300">
+                    {theme === 'dark' ? 'Scuro' : 'Chiaro'}
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={toggleTheme}
+                className="bg-teal-500 hover:bg-teal-600 text-white px-4 py-2 rounded-lg transition-colors font-medium"
+              >
+                Cambia
+              </button>
+            </div>
+            
             <button
               onClick={handleSignOut}
               className="w-full bg-red-500 text-white py-3 rounded-lg font-semibold hover:bg-red-600 transition-colors flex items-center justify-center gap-2"

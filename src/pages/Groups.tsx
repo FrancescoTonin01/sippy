@@ -41,17 +41,17 @@ export const Groups = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Caricamento gruppi...</p>
+          <p className="text-gray-600 dark:text-gray-300">Caricamento gruppi...</p>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4 pb-20">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-4 pb-20">
       <div className="max-w-md mx-auto">
         <motion.div
           initial={{ opacity: 0, y: -20 }}
@@ -59,8 +59,8 @@ export const Groups = () => {
           className="text-center mb-8"
         >
           <div className="text-4xl mb-2">🍻</div>
-          <h1 className="text-3xl font-bold text-gray-800 mb-2">Sippy Squad</h1>
-          <p className="text-gray-600 text-sm mb-6">
+          <h1 className="text-3xl font-bold text-gray-800 dark:text-white mb-2">Sippy Squad</h1>
+          <p className="text-gray-600 dark:text-gray-300 text-sm mb-6">
             I tuoi gruppi di sfida • Bevi responsabilmente, competi intelligentemente
           </p>
           <motion.button
@@ -170,21 +170,21 @@ const GroupCard = ({ group, isOwner, onInvite, onClick, delay }: GroupCardProps)
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay }}
-      className="bg-gradient-to-br from-white to-gray-50 rounded-3xl shadow-lg p-6 cursor-pointer hover:shadow-xl transition-all duration-300 border border-gray-100 hover:border-teal-200"
+      className="bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-700 rounded-3xl shadow-lg p-6 cursor-pointer hover:shadow-xl transition-all duration-300 border border-gray-100 dark:border-gray-600 hover:border-teal-200 dark:hover:border-teal-400"
       onClick={onClick}
       whileHover={{ y: -2 }}
     >
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-3">
           <div className="text-2xl">🍻</div>
-          <h3 className="text-lg font-bold text-gray-800">{group.name}</h3>
+          <h3 className="text-lg font-bold text-gray-800 dark:text-white">{group.name}</h3>
         </div>
         {isOwner && (
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={handleInviteClick}
-            className="bg-teal-100 text-teal-700 hover:bg-teal-200 text-xs font-semibold px-3 py-1 rounded-full transition-colors"
+            className="bg-teal-100 dark:bg-teal-900 text-teal-700 dark:text-teal-300 hover:bg-teal-200 dark:hover:bg-teal-800 text-xs font-semibold px-3 py-1 rounded-full transition-colors"
           >
             <span className="mr-1">➕</span>Invita
           </motion.button>
@@ -194,20 +194,20 @@ const GroupCard = ({ group, isOwner, onInvite, onClick, delay }: GroupCardProps)
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center text-sm">
           <span className="text-lg mr-2">{isOwner ? '👑' : '🤝'}</span>
-          <span className={`font-medium ${isOwner ? 'text-yellow-600' : 'text-teal-600'}`}>
+          <span className={`font-medium ${isOwner ? 'text-yellow-600 dark:text-yellow-400' : 'text-teal-600 dark:text-teal-400'}`}>
             {isOwner ? 'Squad Leader' : 'Squad Member'}
           </span>
         </div>
         {group.weekly_budget && (
-          <div className="text-xs text-orange-600 bg-orange-50 px-3 py-1 rounded-full font-semibold">
+          <div className="text-xs text-orange-600 dark:text-orange-400 bg-orange-50 dark:bg-orange-900/30 px-3 py-1 rounded-full font-semibold">
             🎯 €{group.weekly_budget}/week
           </div>
         )}
       </div>
 
-      <div className="bg-gray-50/70 rounded-2xl p-4 mb-4">
+      <div className="bg-gray-50/70 dark:bg-gray-600/30 rounded-2xl p-4 mb-4">
         <div className="flex items-center justify-between mb-2">
-          <p className="text-sm font-semibold text-gray-700 flex items-center gap-2">
+          <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-2">
             <span>👥</span>
             Squad Members ({loading ? '...' : members.length})
           </p>
@@ -219,12 +219,12 @@ const GroupCard = ({ group, isOwner, onInvite, onClick, delay }: GroupCardProps)
         ) : (
           <div className="flex flex-wrap gap-2">
             {members.slice(0, 3).map((member) => (
-              <div key={member.id} className="bg-white px-3 py-1 rounded-full text-xs font-medium text-gray-700">
+              <div key={member.id} className="bg-white dark:bg-gray-700 px-3 py-1 rounded-full text-xs font-medium text-gray-700 dark:text-gray-300">
                 {member.username}
               </div>
             ))}
             {members.length > 3 && (
-              <div className="bg-teal-100 text-teal-700 px-3 py-1 rounded-full text-xs font-medium">
+              <div className="bg-teal-100 dark:bg-teal-900 text-teal-700 dark:text-teal-300 px-3 py-1 rounded-full text-xs font-medium">
                 +{members.length - 3} altri
               </div>
             )}
@@ -233,7 +233,7 @@ const GroupCard = ({ group, isOwner, onInvite, onClick, delay }: GroupCardProps)
       </div>
 
       <div className="text-center">
-        <div className="flex items-center justify-center gap-2 text-xs text-gray-500 mb-2">
+        <div className="flex items-center justify-center gap-2 text-xs text-gray-500 dark:text-gray-400 mb-2">
           <span>📊</span>
           <span>Tocca per vedere statistiche e classifiche</span>
         </div>

@@ -76,6 +76,46 @@ export const joinGroup = async (userId: string, groupId: string) => {
 }
 
 export const leaveGroup = async (userId: string, groupId: string) => {
+  const { data: group, error: groupError } = await supabase
+    .from('groups')
+    .select('owner_id')
+    .eq('id', groupId)
+    .single()
+
+  if (groupError) {
+    return { error: groupError }
+  }
+
+  // If the leaving user is the owner, we need to transfer ownership
+  if (group.owner_id === userId) {
+    // Get the oldest member who is not the current owner
+    const { data: members, error: membersError } = await supabase
+      .from('group_members')
+      .select('user_id, created_at')
+      .eq('group_id', groupId)
+      .neq('user_id', userId)
+      .order('created_at', { ascending: true })
+      .limit(1)
+
+    if (membersError) {
+      return { error: membersError }
+    }
+
+    if (members && members.length > 0) {
+      // Transfer ownership to the oldest member
+      const { error: updateError } = await supabase
+        .from('groups')
+        .update({ owner_id: members[0].user_id })
+        .eq('id', groupId)
+
+      if (updateError) {
+        return { error: updateError }
+      }
+    }
+    // If no other members exist, the group will be deleted when the last member leaves
+  }
+
+  // Remove the user from the group
   const { error } = await supabase
     .from('group_members')
     .delete()
@@ -83,6 +123,51 @@ export const leaveGroup = async (userId: string, groupId: string) => {
     .eq('user_id', userId)
 
   return { error }
+}
+
+export const deleteGroup = async (userId: string, groupId: string) => {
+  // First check if the user is the owner
+  const { data: group, error: groupError } = await supabase
+    .from('groups')
+    .select('owner_id')
+    .eq('id', groupId)
+    .single()
+
+  if (groupError) {
+    return { error: groupError }
+  }
+
+  if (group.owner_id !== userId) {
+    return { error: { message: 'Solo il proprietario può eliminare il gruppo' } }
+  }
+
+  // Delete all group members first (due to foreign key constraints)
+  const { error: membersError } = await supabase
+    .from('group_members')
+    .delete()
+    .eq('group_id', groupId)
+
+  if (membersError) {
+    return { error: membersError }
+  }
+
+  // Delete all drinks associated with this group
+  const { error: drinksError } = await supabase
+    .from('drinks')
+    .delete()
+    .eq('group_id', groupId)
+
+  if (drinksError) {
+    return { error: drinksError }
+  }
+
+  // Finally delete the group
+  const { error: deleteError } = await supabase
+    .from('groups')
+    .delete()
+    .eq('id', groupId)
+
+  return { error: deleteError }
 }
 
 export const getGroupMembers = async (groupId: string): Promise<{ data: Member[] | null, error: Error | null }> => {

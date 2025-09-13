@@ -21,14 +21,14 @@ export const UserProgressCard = ({ member, groupBudget, isCurrentUser, onClick }
   }
 
   const getBorderColor = () => {
-    if (isCurrentUser) return 'border-teal-500'
-    if (member.is_within_budget) return 'border-green-200'
-    return 'border-red-200'
+    if (isCurrentUser) return 'border-teal-500 dark:border-teal-400'
+    if (member.is_within_budget) return 'border-green-200 dark:border-green-700'
+    return 'border-red-200 dark:border-red-700'
   }
 
   const getBackgroundColor = () => {
-    if (isCurrentUser) return 'bg-teal-50'
-    return 'bg-white'
+    if (isCurrentUser) return 'bg-teal-50 dark:bg-teal-900/30'
+    return 'bg-white dark:bg-gray-800'
   }
 
   const handleClick = () => {
@@ -49,24 +49,24 @@ export const UserProgressCard = ({ member, groupBudget, isCurrentUser, onClick }
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-3">
           <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-            isCurrentUser ? 'bg-teal-100' : 'bg-gray-100'
+            isCurrentUser ? 'bg-teal-100 dark:bg-teal-800' : 'bg-gray-100 dark:bg-gray-700'
           }`}>
             <span className={`font-semibold ${
-              isCurrentUser ? 'text-teal-600' : 'text-gray-600'
+              isCurrentUser ? 'text-teal-600 dark:text-teal-300' : 'text-gray-600 dark:text-gray-300'
             }`}>
               {member.username.charAt(0).toUpperCase()}
             </span>
           </div>
           <div>
-            <h3 className="font-semibold text-gray-800">
+            <h3 className="font-semibold text-gray-800 dark:text-white">
               {member.username}
               {isCurrentUser && (
-                <span className="ml-2 text-xs bg-teal-100 text-teal-800 px-2 py-1 rounded-full">
+                <span className="ml-2 text-xs bg-teal-100 dark:bg-teal-800 text-teal-800 dark:text-teal-200 px-2 py-1 rounded-full">
                   Tu
                 </span>
               )}
             </h3>
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-gray-600 dark:text-gray-300">
               {member.drinks_count} drink{member.drinks_count !== 1 ? 's' : ''} • €{member.weekly_spent.toFixed(2)}
             </p>
           </div>
@@ -76,15 +76,15 @@ export const UserProgressCard = ({ member, groupBudget, isCurrentUser, onClick }
           {getStreakDisplay() && (
             <div className="flex items-center gap-1">
               <span className="text-lg">{getStreakDisplay()}</span>
-              <span className="text-xs text-gray-500">{member.streak_weeks}w</span>
+              <span className="text-xs text-gray-500 dark:text-gray-400">{member.streak_weeks}w</span>
             </div>
           )}
           {member.is_within_budget ? (
-            <span className="text-green-600 text-sm font-medium">
+            <span className="text-green-600 dark:text-green-400 text-sm font-medium">
               ✅ Nel budget
             </span>
           ) : (
-            <span className="text-red-600 text-sm font-medium">
+            <span className="text-red-600 dark:text-red-400 text-sm font-medium">
               ❌ Sforato
             </span>
           )}
@@ -93,8 +93,8 @@ export const UserProgressCard = ({ member, groupBudget, isCurrentUser, onClick }
 
       <div className="space-y-2">
         <div className="flex justify-between items-center text-sm">
-          <span className="text-gray-600">Obiettivo gruppo</span>
-          <span className="text-gray-800 font-medium">
+          <span className="text-gray-600 dark:text-gray-300">Obiettivo gruppo</span>
+          <span className="text-gray-800 dark:text-white font-medium">
             €{remainingBudget.toFixed(2)} rimasti
           </span>
         </div>
@@ -107,7 +107,7 @@ export const UserProgressCard = ({ member, groupBudget, isCurrentUser, onClick }
           animate={{ opacity: 1, scale: 1 }}
           className="mt-3 text-center"
         >
-          <p className="text-xs text-green-700 font-medium">
+          <p className="text-xs text-green-700 dark:text-green-300 font-medium">
             {member.streak_weeks === 1 
               ? `🎉 Prima settimana di successo!`
               : `🎉 ${member.streak_weeks} settimane consecutive nel budget!`
