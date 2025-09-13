@@ -24,7 +24,7 @@ const AppLayout = ({ children }: { children: React.ReactNode }) => {
 function App() {
   return (
     <AuthProvider>
-      <Router>
+      <Router basename="/sippy">
         <AppLayout>
           <Routes>
             <Route path="/login" element={<Login />} />

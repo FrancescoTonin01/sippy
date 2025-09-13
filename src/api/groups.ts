@@ -358,8 +358,25 @@ export interface GroupDrink {
   created_at: string
 }
 
-export const getGroupRecentDrinks = async (limit: number = 10): Promise<{ data: GroupDrink[] | null, error: Error | null }> => {
+export const getGroupRecentDrinks = async (groupId: string, limit: number = 10): Promise<{ data: GroupDrink[] | null, error: Error | null }> => {
   try {
+    // Prima cerchiamo i membri del gruppo
+    const { data: members, error: membersError } = await supabase
+      .from('group_members')
+      .select('user_id')
+      .eq('group_id', groupId)
+
+    if (membersError) {
+      return { data: null, error: membersError }
+    }
+
+    if (!members || members.length === 0) {
+      return { data: [], error: null }
+    }
+
+    const memberIds = members.map(m => m.user_id)
+
+    // Poi prendiamo i drink di questi membri
     const { data, error } = await supabase
       .from('drinks')
       .select(`
@@ -374,6 +391,7 @@ export const getGroupRecentDrinks = async (limit: number = 10): Promise<{ data: 
           username
         )
       `)
+      .in('user_id', memberIds)
       .order('created_at', { ascending: false })
       .limit(limit)
 

@@ -142,7 +142,14 @@ export const useUserSearch = (excludeUserId?: string) => {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  const search = async (query: string) => {
+  const search = useCallback(async (query: string) => {
+    if (!query.trim()) {
+      setUsers([])
+      setError(null)
+      setLoading(false)
+      return
+    }
+
     setLoading(true)
     setError(null)
 
@@ -159,7 +166,7 @@ export const useUserSearch = (excludeUserId?: string) => {
     } finally {
       setLoading(false)
     }
-  }
+  }, [excludeUserId])
 
   return {
     users,

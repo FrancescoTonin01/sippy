@@ -79,27 +79,21 @@ export const Leaderboard = ({ data, currentUserId }: LeaderboardProps) => {
                 </span>
               )}
             </div>
-            <div className="flex items-center gap-3 text-sm text-gray-600">
-              <span>{entry.drink_count} drink</span>
-              <span>•</span>
-              <span>€{entry.total_cost.toFixed(2)} spesi</span>
+            <div className="text-sm text-gray-600">
+              €{entry.total_cost.toFixed(2)} spesi
               {entry.drink_count > 0 && (
-                <>
-                  <span>•</span>
-                  <span>€{(entry.total_cost / entry.drink_count).toFixed(2)} media</span>
-                </>
+                <span className="text-xs text-gray-500 ml-2">
+                  (€{(entry.total_cost / entry.drink_count).toFixed(1)} per drink)
+                </span>
               )}
             </div>
           </div>
 
           <div className="text-right">
-            <div className="text-lg font-bold text-gray-800">
+            <div className="text-2xl font-bold text-gray-800">
               {entry.drink_count}
             </div>
             <div className="text-xs text-gray-500">drink</div>
-            <div className="text-xs text-gray-500 mt-1">
-              €{entry.total_cost.toFixed(0)}
-            </div>
           </div>
         </motion.div>
       ))}

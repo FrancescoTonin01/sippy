@@ -53,35 +53,59 @@ export const Groups = () => {
   return (
     <div className="min-h-screen bg-gray-50 p-4 pb-20">
       <div className="max-w-md mx-auto">
-        <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-bold text-gray-800">I tuoi gruppi</h1>
-          <button
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-center mb-8"
+        >
+          <div className="text-4xl mb-2">🍻</div>
+          <h1 className="text-3xl font-bold text-gray-800 mb-2">Sippy Squad</h1>
+          <p className="text-gray-600 text-sm mb-6">
+            I tuoi gruppi di sfida • Bevi responsabilmente, competi intelligentemente
+          </p>
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
             onClick={() => setShowCreateModal(true)}
-            className="bg-teal-600 text-white p-2 rounded-lg hover:bg-teal-700 transition-colors"
+            className="bg-gradient-to-r from-teal-600 to-teal-700 text-white px-6 py-3 rounded-full font-semibold shadow-lg hover:shadow-xl transition-all duration-200 flex items-center gap-2 mx-auto"
           >
-            <span className="text-xl">+</span>
-          </button>
-        </div>
+            <span className="text-lg">🚀</span>
+            Crea nuovo squad
+          </motion.button>
+        </motion.div>
 
         {groups.length === 0 ? (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-white rounded-2xl shadow-lg p-8 text-center"
+            className="bg-gradient-to-br from-orange-50 to-teal-50 rounded-3xl shadow-lg p-8 text-center border border-orange-100"
           >
-            <div className="text-4xl mb-4">👥</div>
-            <h2 className="text-lg font-semibold text-gray-800 mb-2">
-              Nessun gruppo
+            <div className="text-6xl mb-4">🏁</div>
+            <h2 className="text-xl font-bold text-gray-800 mb-3">
+              Pronto per la sfida?
             </h2>
-            <p className="text-gray-600 mb-6">
-              Crea il tuo primo gruppo per sfidare gli amici!
+            <p className="text-gray-600 mb-2 leading-relaxed">
+              🎯 Monitora i tuoi consumi con gli amici
             </p>
-            <button
+            <p className="text-gray-600 mb-2 leading-relaxed">
+              🏆 Competi in classifiche settimanali
+            </p>
+            <p className="text-gray-600 mb-6 leading-relaxed">
+              🔥 Mantieni streak di consumo responsabile
+            </p>
+            <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-4 mb-6">
+              <p className="text-sm text-gray-700 font-medium">
+                💡 <strong>Primo squad?</strong> Invita 2-3 amici e iniziate a tracciare insieme!
+              </p>
+            </div>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
               onClick={() => setShowCreateModal(true)}
-              className="bg-teal-600 text-white px-6 py-2 rounded-lg hover:bg-teal-700 transition-colors"
+              className="bg-gradient-to-r from-orange-500 to-teal-600 text-white px-8 py-3 rounded-full font-bold shadow-lg hover:shadow-xl transition-all duration-200 text-lg"
             >
-              Crea gruppo
-            </button>
+              🚀 Iniziamo!
+            </motion.button>
           </motion.div>
         ) : (
           <div className="space-y-4">
@@ -146,63 +170,78 @@ const GroupCard = ({ group, isOwner, onInvite, onClick, delay }: GroupCardProps)
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay }}
-      className="bg-white rounded-2xl shadow-lg p-6 cursor-pointer hover:shadow-xl transition-shadow"
+      className="bg-gradient-to-br from-white to-gray-50 rounded-3xl shadow-lg p-6 cursor-pointer hover:shadow-xl transition-all duration-300 border border-gray-100 hover:border-teal-200"
       onClick={onClick}
+      whileHover={{ y: -2 }}
     >
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-semibold text-gray-800">{group.name}</h3>
+        <div className="flex items-center gap-3">
+          <div className="text-2xl">🍻</div>
+          <h3 className="text-lg font-bold text-gray-800">{group.name}</h3>
+        </div>
         {isOwner && (
-          <div className="flex space-x-2">
-            <button
-              onClick={handleInviteClick}
-              className="text-teal-600 hover:text-teal-700 text-sm font-medium hover:bg-teal-50 px-2 py-1 rounded"
-            >
-              Invita
-            </button>
-          </div>
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={handleInviteClick}
+            className="bg-teal-100 text-teal-700 hover:bg-teal-200 text-xs font-semibold px-3 py-1 rounded-full transition-colors"
+          >
+            <span className="mr-1">➕</span>Invita
+          </motion.button>
         )}
       </div>
 
-      <div className="flex items-center justify-between mb-3">
-        <div className="flex items-center text-sm text-gray-600">
-          <span className="text-lg mr-2">👑</span>
-          <span>{isOwner ? 'Proprietario' : 'Membro'}</span>
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center text-sm">
+          <span className="text-lg mr-2">{isOwner ? '👑' : '🤝'}</span>
+          <span className={`font-medium ${isOwner ? 'text-yellow-600' : 'text-teal-600'}`}>
+            {isOwner ? 'Squad Leader' : 'Squad Member'}
+          </span>
         </div>
         {group.weekly_budget && (
-          <div className="text-xs text-teal-600 bg-teal-50 px-2 py-1 rounded-full">
-            €{group.weekly_budget}/settimana
+          <div className="text-xs text-orange-600 bg-orange-50 px-3 py-1 rounded-full font-semibold">
+            🎯 €{group.weekly_budget}/week
           </div>
         )}
       </div>
 
-      <div>
-        <p className="text-sm font-medium text-gray-700 mb-2">
-          Membri ({loading ? '...' : members.length})
-        </p>
+      <div className="bg-gray-50/70 rounded-2xl p-4 mb-4">
+        <div className="flex items-center justify-between mb-2">
+          <p className="text-sm font-semibold text-gray-700 flex items-center gap-2">
+            <span>👥</span>
+            Squad Members ({loading ? '...' : members.length})
+          </p>
+        </div>
         {loading ? (
           <div className="text-center py-2">
             <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-teal-600 mx-auto"></div>
           </div>
         ) : (
-          <div className="space-y-1">
+          <div className="flex flex-wrap gap-2">
             {members.slice(0, 3).map((member) => (
-              <p key={member.id} className="text-sm text-gray-600">
+              <div key={member.id} className="bg-white px-3 py-1 rounded-full text-xs font-medium text-gray-700">
                 {member.username}
-              </p>
+              </div>
             ))}
             {members.length > 3 && (
-              <p className="text-sm text-gray-500">
+              <div className="bg-teal-100 text-teal-700 px-3 py-1 rounded-full text-xs font-medium">
                 +{members.length - 3} altri
-              </p>
+              </div>
             )}
           </div>
         )}
       </div>
 
-      <div className="mt-4 pt-4 border-t border-gray-100 text-center">
-        <p className="text-xs text-gray-500">
-          Clicca per vedere i progressi del gruppo
-        </p>
+      <div className="text-center">
+        <div className="flex items-center justify-center gap-2 text-xs text-gray-500 mb-2">
+          <span>📊</span>
+          <span>Tocca per vedere statistiche e classifiche</span>
+        </div>
+        <div className="flex justify-center gap-1">
+          <div className="w-2 h-1 bg-teal-400 rounded-full"></div>
+          <div className="w-2 h-1 bg-orange-400 rounded-full"></div>
+          <div className="w-2 h-1 bg-teal-400 rounded-full"></div>
+        </div>
       </div>
     </motion.div>
   )

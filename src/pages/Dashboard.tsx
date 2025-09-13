@@ -46,29 +46,45 @@ export const Dashboard = () => {
           animate={{ opacity: 1, y: 0 }}
           className="bg-white rounded-2xl shadow-lg p-6 mb-6"
         >
-          <h1 className="text-2xl font-bold text-gray-800 mb-4">
-            Ciao, {user?.user_metadata?.username || 'Utente'}! 👋
-          </h1>
+          <div className="text-center mb-6">
+            <div className="text-4xl mb-2">🍻</div>
+            <h1 className="text-2xl font-bold text-gray-800 mb-1">
+              Hey {user?.user_metadata?.username || 'Sippy'}! 
+            </h1>
+            <p className="text-gray-600 text-sm">
+              Come va il tuo consumo responsabile oggi? 🎯
+            </p>
+          </div>
           
           <div className="mb-6">
-            <div className="flex justify-between items-center mb-2">
-              <span className="text-sm font-medium text-gray-700">
-                Questa settimana
-              </span>
-              <span className="text-sm text-gray-600">
-                €{budgetRemaining.toFixed(2)} rimasti
-              </span>
+            <div className="bg-gradient-to-br from-teal-50 to-orange-50 rounded-2xl p-4 mb-4">
+              <div className="flex justify-between items-center mb-2">
+                <span className="text-sm font-semibold text-gray-700 flex items-center gap-2">
+                  <span>📅</span>
+                  Settimana corrente
+                </span>
+                <span className="text-sm font-bold text-teal-600">
+                  €{budgetRemaining.toFixed(2)} disponibili
+                </span>
+              </div>
+              <ProgressBar progress={progress} />
+              <div className="flex justify-between text-xs text-gray-600 mt-2">
+                <span>💸 Speso: €{weeklySpent.toFixed(2)}</span>
+                <span>🎯 Budget: €{weeklyBudget.toFixed(2)}</span>
+              </div>
             </div>
-            <ProgressBar progress={progress} />
           </div>
 
-          <button
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
             onClick={() => setShowForm(true)}
-            className="w-full bg-teal-600 text-white py-3 rounded-lg font-semibold hover:bg-teal-700 transition-colors flex items-center justify-center gap-2"
+            className="w-full bg-gradient-to-r from-teal-600 to-teal-700 text-white py-4 rounded-2xl font-bold hover:shadow-lg transition-all duration-200 flex items-center justify-center gap-3"
           >
-            <span className="text-xl">+</span>
-            Aggiungi Drink
-          </button>
+            <span className="text-2xl">🍺</span>
+            <span>Traccia un drink</span>
+            <span className="text-lg">✨</span>
+          </motion.button>
         </motion.div>
 
         <motion.div
@@ -86,14 +102,23 @@ export const Dashboard = () => {
           transition={{ delay: 0.2 }}
           className="bg-white rounded-2xl shadow-lg p-6"
         >
-          <h2 className="text-lg font-semibold text-gray-800 mb-4">
-            Storico settimanale
-          </h2>
+          <div className="flex items-center gap-3 mb-4">
+            <span className="text-2xl">📊</span>
+            <h2 className="text-lg font-bold text-gray-800">
+              I tuoi drink della settimana
+            </h2>
+          </div>
           
           {weeklyDrinks.length === 0 ? (
-            <p className="text-gray-500 text-center py-8">
-              Nessun drink registrato questa settimana
-            </p>
+            <div className="text-center py-8 bg-gray-50 rounded-2xl">
+              <div className="text-4xl mb-3">🎯</div>
+              <p className="text-gray-600 font-medium mb-2">
+                Settimana pulita! 
+              </p>
+              <p className="text-gray-500 text-sm">
+                Nessun drink registrato ancora. Keep it up! 💪
+              </p>
+            </div>
           ) : (
             <div className="space-y-3">
               {weeklyDrinks.map((drink) => (

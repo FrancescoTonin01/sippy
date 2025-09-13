@@ -23,6 +23,8 @@ export const InviteUserModal = ({ isOpen, onClose, onInvite }: InviteUserModalPr
       }, 300)
       
       return () => clearTimeout(timeoutId)
+    } else {
+      search('')
     }
   }, [query, search])
 

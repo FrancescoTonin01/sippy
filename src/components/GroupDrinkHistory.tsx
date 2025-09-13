@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion'
 import type { GroupDrink } from '../api/groups'
+import { formatDateFromUTC } from '../utils/dateHelpers'
 
 interface GroupDrinkHistoryProps {
   drinks: GroupDrink[]
@@ -8,10 +9,11 @@ interface GroupDrinkHistoryProps {
 }
 
 export const GroupDrinkHistory = ({ drinks, loading, currentUserId }: GroupDrinkHistoryProps) => {
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString)
+  const formatDate = (utcDateString: string) => {
+    // La data arriva come UTC, ma dobbiamo calcolare la differenza correttamente
+    const utcDate = new Date(utcDateString)
     const now = new Date()
-    const diffMs = now.getTime() - date.getTime()
+    const diffMs = now.getTime() - utcDate.getTime()
     const diffHours = Math.floor(diffMs / (1000 * 60 * 60))
     const diffDays = Math.floor(diffHours / 24)
     
@@ -20,16 +22,17 @@ export const GroupDrinkHistory = ({ drinks, loading, currentUserId }: GroupDrink
     if (diffDays === 1) return 'Ieri'
     if (diffDays < 7) return `${diffDays}g fa`
     
-    return date.toLocaleDateString('it-IT', { 
-      day: 'numeric', 
-      month: 'short' 
-    })
+    return formatDateFromUTC(utcDateString)
   }
 
-  const formatTime = (dateString: string) => {
-    return new Date(dateString).toLocaleTimeString('it-IT', {
+  const formatTime = (utcDateString: string) => {
+    const normalizedString = utcDateString.endsWith('Z') ? utcDateString : utcDateString + 'Z'
+    const utcDate = new Date(normalizedString)
+    
+    return utcDate.toLocaleString('it-IT', {
       hour: '2-digit',
-      minute: '2-digit'
+      minute: '2-digit',
+      timeZone: 'Europe/Rome'
     })
   }
 

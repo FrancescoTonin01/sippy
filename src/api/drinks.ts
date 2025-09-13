@@ -72,8 +72,11 @@ export const deleteDrink = async (drinkId: string) => {
 
 export const getWeeklyDrinks = async (userId: string) => {
   const now = new Date()
-  const startOfWeek = new Date(now.setDate(now.getDate() - now.getDay()))
-  const endOfWeek = new Date(now.setDate(now.getDate() - now.getDay() + 6))
+  const startOfWeek = new Date(now)
+  startOfWeek.setDate(now.getDate() - now.getDay())
+  
+  const endOfWeek = new Date(startOfWeek)
+  endOfWeek.setDate(startOfWeek.getDate() + 6)
 
   return getDrinks(
     userId,

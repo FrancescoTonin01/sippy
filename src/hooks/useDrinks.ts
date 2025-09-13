@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useAuth } from './useAuth'
 import { getDrinks, getWeeklyDrinks, createDrink } from '../api/drinks'
+import { getStartOfWeek } from '../utils/dateHelpers'
 import type { Drink, CreateDrinkData } from '../api/drinks'
 
 export const useDrinks = () => {
@@ -66,8 +67,7 @@ export const useDrinks = () => {
         setDrinks([data, ...drinks])
         
         const drinkDate = new Date(data.date)
-        const now = new Date()
-        const startOfWeek = new Date(now.setDate(now.getDate() - now.getDay()))
+        const startOfWeek = getStartOfWeek()
         
         if (drinkDate >= startOfWeek) {
           setWeeklyDrinks([data, ...weeklyDrinks])

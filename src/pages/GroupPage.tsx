@@ -2,16 +2,15 @@ import { useState, useEffect, useCallback } from 'react'
 import { useParams } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { useAuth } from '../hooks/useAuth'
-import { getGroupMembersProgress, updateGroupBudget, getGroupRecentDrinks } from '../api/groups'
-import { getGroupLeaderboard } from '../api/functions'
+import { updateGroupBudget, getGroupRecentDrinks } from '../api/groups'
+import { getGroupCompleteData, type LeaderboardEntry } from '../api/groupsOptimized'
 import { UserProgressCard } from '../components/UserProgressCard'
 import { Leaderboard } from '../components/Leaderboard'
 import { GroupBudgetModal } from '../components/GroupBudgetModal'
 import { GroupDrinkHistory } from '../components/GroupDrinkHistory'
 import { UserProfileModal } from '../components/UserProfileModal'
+import { GroupHeaderSkeleton, UserProgressSkeleton, LeaderboardSkeleton, DrinkHistorySkeleton } from '../components/SkeletonLoader'
 import type { GroupMemberProgress, Group, GroupDrink } from '../api/groups'
-import type { LeaderboardEntry } from '../api/functions'
-import { supabase } from '../utils/supabase'
 
 export const GroupPage = () => {
   const { groupId } = useParams()
@@ -23,6 +22,8 @@ export const GroupPage = () => {
   const [recentDrinks, setRecentDrinks] = useState<GroupDrink[]>([])
   const [loading, setLoading] = useState(true)
   const [refreshing, setRefreshing] = useState(false)
+  const [tabLoading] = useState<Record<string, boolean>>({})
+  
   const [showBudgetModal, setShowBudgetModal] = useState(false)
   const [showUserProfile, setShowUserProfile] = useState(false)
   const [selectedUser, setSelectedUser] = useState<{ id: string; username: string } | null>(null)
@@ -35,42 +36,39 @@ export const GroupPage = () => {
     try {
       setLoading(true)
       
-      // Get group info
-      const { data: groupData } = await supabase
-        .from('groups')
-        .select('*')
-        .eq('id', groupId)
-        .single()
+      // Super optimized: Get group, progress AND leaderboard in one call + drinks separately
+      const [completeDataResult, drinksResult] = await Promise.allSettled([
+        getGroupCompleteData(groupId),
+        getGroupRecentDrinks(groupId, 10)
+      ])
 
-      if (groupData) {
-        setGroup(groupData)
-      }
-
-      // Get members progress
-      const { data: progressData } = await getGroupMembersProgress(groupId)
-      
-      if (progressData) {
-        setMembersProgress(progressData)
-      }
-
-      // Get leaderboard for the toggle view
-      setLeaderboardError(null)
-      const { data: leaderboardData, error: leaderboardErr } = await getGroupLeaderboard(groupId)
-      if (leaderboardErr) {
-        setLeaderboardError('Errore nel caricamento della classifica')
+      // Handle complete group data (group info + progress + leaderboard)
+      if (completeDataResult.status === 'fulfilled') {
+        const { group: groupData, progress: progressData, leaderboard: leaderboardData, error } = completeDataResult.value
+        if (!error && groupData) {
+          setGroup(groupData)
+          setMembersProgress(progressData)
+          setLeaderboard(leaderboardData)
+          setLeaderboardError(null)
+        } else {
+          setLeaderboardError('Errore nel caricamento dei dati gruppo')
+        }
+      } else {
+        setLeaderboardError('Errore nel caricamento dei dati gruppo')
         setLeaderboard([])
-      } else if (leaderboardData) {
-        setLeaderboard(leaderboardData)
       }
 
-      // Get recent drinks
-      const { data: drinksData } = await getGroupRecentDrinks(10)
-      if (drinksData) {
-        setRecentDrinks(drinksData)
+      // Handle recent drinks
+      if (drinksResult.status === 'fulfilled') {
+        const { data: drinksData } = drinksResult.value
+        if (drinksData) {
+          setRecentDrinks(drinksData)
+        }
       }
 
     } catch (error) {
       console.error('Error loading group data:', error)
+      setLeaderboardError('Errore nel caricamento')
     } finally {
       setLoading(false)
       setRefreshing(false)
@@ -106,28 +104,31 @@ export const GroupPage = () => {
     loadGroupData()
   }, [loadGroupData])
 
-  // Auto-refresh every 2 minutes when page is visible
+  // Refresh less aggressively - every 5 minutes instead of 2
   useEffect(() => {
     const interval = setInterval(() => {
-      if (document.visibilityState === 'visible') {
+      if (document.visibilityState === 'visible' && !refreshing) {
         loadGroupData()
       }
-    }, 120000)
+    }, 300000) // 5 minutes instead of 2
 
     return () => clearInterval(interval)
-  }, [loadGroupData])
+  }, [loadGroupData, refreshing])
 
-  // Refresh when page becomes visible again
+  // Only refresh on visibility change if data is older than 1 minute
   useEffect(() => {
     const handleVisibilityChange = () => {
-      if (document.visibilityState === 'visible') {
-        loadGroupData()
+      if (document.visibilityState === 'visible' && lastUpdate) {
+        const timeSinceUpdate = Date.now() - lastUpdate.getTime()
+        if (timeSinceUpdate > 60000 && !refreshing) { // Only if more than 1 minute old
+          loadGroupData()
+        }
       }
     }
 
     document.addEventListener('visibilitychange', handleVisibilityChange)
     return () => document.removeEventListener('visibilitychange', handleVisibilityChange)
-  }, [loadGroupData])
+  }, [loadGroupData, lastUpdate, refreshing])
 
   const handleManualRefresh = () => {
     setRefreshing(true)
@@ -146,10 +147,14 @@ export const GroupPage = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Caricamento gruppo...</p>
+      <div className="min-h-screen bg-gray-50 p-4 pb-20">
+        <div className="max-w-md mx-auto">
+          <GroupHeaderSkeleton />
+          <div className="space-y-4">
+            <UserProgressSkeleton />
+            <UserProgressSkeleton />
+            <UserProgressSkeleton />
+          </div>
         </div>
       </div>
     )
@@ -270,7 +275,9 @@ export const GroupPage = () => {
               )}
             </div>
             
-            {leaderboardError ? (
+            {tabLoading['leaderboard'] ? (
+              <LeaderboardSkeleton />
+            ) : leaderboardError ? (
               <div className="bg-red-50 border border-red-200 rounded-xl p-4 text-center">
                 <p className="text-red-800 font-medium">❌ {leaderboardError}</p>
                 <button 
@@ -329,11 +336,15 @@ export const GroupPage = () => {
         )}
 
         {activeTab === 'drinks' && (
-          <GroupDrinkHistory 
-            drinks={recentDrinks}
-            loading={loading}
-            currentUserId={user?.id}
-          />
+          tabLoading['drinks'] ? (
+            <DrinkHistorySkeleton />
+          ) : (
+            <GroupDrinkHistory 
+              drinks={recentDrinks}
+              loading={false}
+              currentUserId={user?.id}
+            />
+          )
         )}
       </div>
 

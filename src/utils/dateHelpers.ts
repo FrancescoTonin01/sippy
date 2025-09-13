@@ -19,6 +19,36 @@ export const formatDate = (date: string | Date): string => {
   })
 }
 
+export const formatDateTimeFromUTC = (utcDateString: string): string => {
+  // Se la stringa finisce con 'Z', è già UTC
+  // Se no, aggiungiamo 'Z' per forzare l'interpretazione UTC
+  const normalizedString = utcDateString.endsWith('Z') ? utcDateString : utcDateString + 'Z'
+  const utcDate = new Date(normalizedString)
+  
+  return utcDate.toLocaleString('it-IT', {
+    timeZone: 'Europe/Rome',
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  })
+}
+
+export const formatDateFromUTC = (utcDateString: string): string => {
+  // Se la stringa finisce con 'Z', è già UTC
+  // Se no, aggiungiamo 'Z' per forzare l'interpretazione UTC
+  const normalizedString = utcDateString.endsWith('Z') ? utcDateString : utcDateString + 'Z'
+  const utcDate = new Date(normalizedString)
+  
+  return utcDate.toLocaleDateString('it-IT', {
+    timeZone: 'Europe/Rome',
+    weekday: 'short',
+    day: 'numeric',
+    month: 'short'
+  })
+}
+
 export const formatCurrency = (amount: number): string => {
   return new Intl.NumberFormat('it-IT', {
     style: 'currency',
