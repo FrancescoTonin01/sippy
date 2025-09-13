@@ -45,13 +45,13 @@ export const DrinkForm = ({ onSubmit, onCancel }: DrinkFormProps) => {
         initial={{ y: '100%' }}
         animate={{ y: 0 }}
         exit={{ y: '100%' }}
-        className="bg-white rounded-t-2xl w-full max-w-md p-6"
+        className="bg-white dark:bg-gray-800 rounded-t-2xl w-full max-w-md p-6"
       >
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-xl font-bold text-gray-800">Aggiungi Drink</h2>
+          <h2 className="text-xl font-bold text-gray-800 dark:text-white">Aggiungi Drink</h2>
           <button
             onClick={onCancel}
-            className="text-gray-400 hover:text-gray-600 text-2xl"
+            className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 text-2xl"
           >
             ×
           </button>
@@ -59,14 +59,14 @@ export const DrinkForm = ({ onSubmit, onCancel }: DrinkFormProps) => {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Tipo di drink
             </label>
             <select
               value={formData.type}
               onChange={(e) => setFormData({ ...formData, type: e.target.value })}
               required
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
             >
               <option value="">Seleziona...</option>
               {drinkTypes.map((type) => (
@@ -78,7 +78,7 @@ export const DrinkForm = ({ onSubmit, onCancel }: DrinkFormProps) => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Costo (€)
             </label>
             <input
@@ -88,13 +88,13 @@ export const DrinkForm = ({ onSubmit, onCancel }: DrinkFormProps) => {
               value={formData.cost}
               onChange={(e) => setFormData({ ...formData, cost: e.target.value })}
               required
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
               placeholder="5.00"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Data
             </label>
             <input
@@ -102,19 +102,19 @@ export const DrinkForm = ({ onSubmit, onCancel }: DrinkFormProps) => {
               value={formData.date}
               onChange={(e) => setFormData({ ...formData, date: e.target.value })}
               required
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Dove
             </label>
             <select
               value={formData.location}
               onChange={(e) => setFormData({ ...formData, location: e.target.value })}
               required
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
             >
               <option value="">Seleziona...</option>
               {locations.map((location) => (
@@ -129,13 +129,13 @@ export const DrinkForm = ({ onSubmit, onCancel }: DrinkFormProps) => {
             <button
               type="button"
               onClick={onCancel}
-              className="flex-1 py-3 border border-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-50"
+              className="flex-1 py-3 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 rounded-lg font-semibold hover:bg-gray-50 dark:hover:bg-gray-600"
             >
               Annulla
             </button>
             <button
               type="submit"
-              className="flex-1 py-3 bg-teal-600 text-white rounded-lg font-semibold hover:bg-teal-700"
+              className="flex-1 py-3 bg-teal-600 dark:bg-teal-700 text-white rounded-lg font-semibold hover:bg-teal-700 dark:hover:bg-teal-600"
             >
               Salva
             </button>

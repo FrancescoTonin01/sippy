@@ -86,9 +86,9 @@ export const UserProfileModal = ({ isOpen, onClose, userId, username }: UserProf
             exit={{ opacity: 0, scale: 0.9, y: 20 }}
             className="fixed inset-0 z-50 flex items-center justify-center p-4"
           >
-            <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg max-h-[85vh] overflow-hidden flex flex-col">
+            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl w-full max-w-lg max-h-[85vh] overflow-hidden flex flex-col">
               {/* Header */}
-              <div className="bg-teal-600 text-white p-6 pb-4">
+              <div className="bg-teal-600 dark:bg-teal-700 text-white p-6 pb-4">
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-3">
                     <div className="w-12 h-12 rounded-full bg-white bg-opacity-20 flex items-center justify-center">
@@ -98,7 +98,7 @@ export const UserProfileModal = ({ isOpen, onClose, userId, username }: UserProf
                     </div>
                     <div>
                       <h2 className="text-xl font-bold">{username}</h2>
-                      <p className="text-teal-100 text-sm">Profilo utente</p>
+                      <p className="text-teal-100 dark:text-teal-200 text-sm">Profilo utente</p>
                     </div>
                   </div>
                   <button
@@ -110,13 +110,13 @@ export const UserProfileModal = ({ isOpen, onClose, userId, username }: UserProf
                 </div>
 
                 {/* Tab Navigation */}
-                <div className="flex bg-white bg-opacity-20 rounded-lg p-1">
+                <div className="flex bg-white dark:bg-gray-700 bg-opacity-20 dark:bg-opacity-100 rounded-lg p-1">
                   <button
                     onClick={() => setActiveTab('stats')}
                     className={`flex-1 py-2 px-3 rounded-md text-sm font-medium transition-colors ${
                       activeTab === 'stats'
-                        ? 'bg-white text-teal-600 shadow-sm'
-                        : 'text-white hover:bg-white hover:bg-opacity-10'
+                        ? 'bg-white dark:bg-gray-800 text-teal-600 dark:text-teal-400 shadow-sm'
+                        : 'text-white hover:bg-white hover:bg-gray-600 hover:bg-opacity-10 dark:hover:bg-opacity-100'
                     }`}
                   >
                     📊 Statistiche
@@ -125,8 +125,8 @@ export const UserProfileModal = ({ isOpen, onClose, userId, username }: UserProf
                     onClick={() => setActiveTab('badges')}
                     className={`flex-1 py-2 px-3 rounded-md text-sm font-medium transition-colors ${
                       activeTab === 'badges'
-                        ? 'bg-white text-teal-600 shadow-sm'
-                        : 'text-white hover:bg-white hover:bg-opacity-10'
+                        ? 'bg-white dark:bg-gray-800 text-teal-600 dark:text-teal-400 shadow-sm'
+                        : 'text-white hover:bg-white hover:bg-gray-600 hover:bg-opacity-10 dark:hover:bg-opacity-100'
                     }`}
                   >
                     🏆 Badge ({unlockedBadges.length})
@@ -135,8 +135,8 @@ export const UserProfileModal = ({ isOpen, onClose, userId, username }: UserProf
                     onClick={() => setActiveTab('drinks')}
                     className={`flex-1 py-2 px-3 rounded-md text-sm font-medium transition-colors ${
                       activeTab === 'drinks'
-                        ? 'bg-white text-teal-600 shadow-sm'
-                        : 'text-white hover:bg-white hover:bg-opacity-10'
+                        ? 'bg-white dark:bg-gray-800 text-teal-600 dark:text-teal-400 shadow-sm'
+                        : 'text-white hover:bg-white hover:bg-gray-600 hover:bg-opacity-10 dark:hover:bg-opacity-100'
                     }`}
                   >
                     🍻 Drinks
@@ -149,7 +149,7 @@ export const UserProfileModal = ({ isOpen, onClose, userId, username }: UserProf
                 {loading ? (
                   <div className="text-center py-12">
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-teal-600 mx-auto mb-4"></div>
-                    <p className="text-gray-600">Caricamento profilo...</p>
+                    <p className="text-gray-600 dark:text-gray-300">Caricamento profilo...</p>
                   </div>
                 ) : (
                   <>
@@ -161,70 +161,70 @@ export const UserProfileModal = ({ isOpen, onClose, userId, username }: UserProf
                         className="space-y-6"
                       >
                         <div className="grid grid-cols-2 gap-4">
-                          <div className="bg-gray-50 rounded-xl p-4">
+                          <div className="bg-gray-50 dark:bg-gray-700 rounded-xl p-4">
                             <p className="text-2xl font-bold text-teal-600">{stats.totalDrinks}</p>
-                            <p className="text-sm text-gray-600">Drink totali</p>
+                            <p className="text-sm text-gray-600 dark:text-gray-300">Drink totali</p>
                           </div>
-                          <div className="bg-gray-50 rounded-xl p-4">
+                          <div className="bg-gray-50 dark:bg-gray-700 rounded-xl p-4">
                             <p className="text-2xl font-bold text-teal-600">€{stats.totalSpent.toFixed(2)}</p>
-                            <p className="text-sm text-gray-600">Spesa totale</p>
+                            <p className="text-sm text-gray-600 dark:text-gray-300">Spesa totale</p>
                           </div>
-                          <div className="bg-gray-50 rounded-xl p-4">
+                          <div className="bg-gray-50 dark:bg-gray-700 rounded-xl p-4">
                             <p className="text-2xl font-bold text-orange-600">{stats.weeklyDrinks}</p>
-                            <p className="text-sm text-gray-600">Questa settimana</p>
+                            <p className="text-sm text-gray-600 dark:text-gray-300">Questa settimana</p>
                           </div>
-                          <div className="bg-gray-50 rounded-xl p-4">
+                          <div className="bg-gray-50 dark:bg-gray-700 rounded-xl p-4">
                             <p className="text-2xl font-bold text-orange-600">€{stats.weeklySpent.toFixed(2)}</p>
-                            <p className="text-sm text-gray-600">Spesa settimanale</p>
+                            <p className="text-sm text-gray-600 dark:text-gray-300">Spesa settimanale</p>
                           </div>
                         </div>
 
-                        <div className="bg-gray-50 rounded-xl p-4">
+                        <div className="bg-gray-50 dark:bg-gray-700 rounded-xl p-4">
                           <div className="grid grid-cols-2 gap-4">
                             <div>
-                              <p className="text-lg font-semibold text-gray-800">€{stats.averageCostPerDrink.toFixed(2)}</p>
-                              <p className="text-sm text-gray-600">Costo medio</p>
+                              <p className="text-lg font-semibold text-gray-800 dark:text-white">€{stats.averageCostPerDrink.toFixed(2)}</p>
+                              <p className="text-sm text-gray-600 dark:text-gray-300">Costo medio</p>
                             </div>
                             <div>
-                              <p className="text-lg font-semibold text-gray-800">{stats.joinedDays}</p>
-                              <p className="text-sm text-gray-600">Giorni nell'app</p>
+                              <p className="text-lg font-semibold text-gray-800 dark:text-white">{stats.joinedDays}</p>
+                              <p className="text-sm text-gray-600 dark:text-gray-300">Giorni nell'app</p>
                             </div>
                             <div>
-                              <p className="text-lg font-semibold text-gray-800">{stats.groupsCount}</p>
-                              <p className="text-sm text-gray-600">Gruppi</p>
+                              <p className="text-lg font-semibold text-gray-800 dark:text-white">{stats.groupsCount}</p>
+                              <p className="text-sm text-gray-600 dark:text-gray-300">Gruppi</p>
                             </div>
                             <div>
-                              <p className="text-lg font-semibold text-gray-800">{stats.achievedWeeklyGoals}</p>
-                              <p className="text-sm text-gray-600">Obiettivi raggiunti</p>
+                              <p className="text-lg font-semibold text-gray-800 dark:text-white">{stats.achievedWeeklyGoals}</p>
+                              <p className="text-sm text-gray-600 dark:text-gray-300">Obiettivi raggiunti</p>
                             </div>
                           </div>
                         </div>
 
                         {(stats.currentStreakWeeks > 0 || stats.maxStreakWeeks > 0) && (
-                          <div className="bg-gradient-to-r from-orange-50 to-red-50 rounded-xl p-4 border border-orange-200">
+                          <div className="bg-gradient-to-r from-orange-50 to-red-50 dark:from-orange-900/30 dark:to-red-900/30 rounded-xl p-4 border border-orange-200 dark:border-orange-700">
                             <div className="flex items-center justify-between">
                               <div>
                                 <div className="flex items-center gap-2 mb-1">
                                   <span className="text-2xl">🔥</span>
-                                  <p className="text-lg font-semibold text-gray-800">
+                                  <p className="text-lg font-semibold text-gray-800 dark:text-white">
                                     {stats.currentStreakWeeks} settimane
                                   </p>
                                 </div>
-                                <p className="text-sm text-gray-600">Streak corrente</p>
+                                <p className="text-sm text-gray-600 dark:text-gray-300">Streak corrente</p>
                               </div>
                               <div className="text-right">
                                 <div className="flex items-center gap-2 mb-1">
                                   <span className="text-2xl">⚡</span>
-                                  <p className="text-lg font-semibold text-gray-800">
+                                  <p className="text-lg font-semibold text-gray-800 dark:text-white">
                                     {stats.maxStreakWeeks} settimane
                                   </p>
                                 </div>
-                                <p className="text-sm text-gray-600">Record streak</p>
+                                <p className="text-sm text-gray-600 dark:text-gray-300">Record streak</p>
                               </div>
                             </div>
                             {stats.currentStreakWeeks > 0 && (
                               <div className="mt-3 text-center">
-                                <p className="text-sm text-orange-700 font-medium">
+                                <p className="text-sm text-orange-700 dark:text-orange-300 font-medium">
                                   🎉 In streak da {stats.currentStreakWeeks} settimana{stats.currentStreakWeeks !== 1 ? 'e' : ''}!
                                 </p>
                               </div>
@@ -242,19 +242,19 @@ export const UserProfileModal = ({ isOpen, onClose, userId, username }: UserProf
                         className="space-y-6"
                       >
                         {/* Summary stats */}
-                        <div className="bg-gradient-to-r from-teal-50 to-orange-50 rounded-xl p-4 border border-teal-200">
+                        <div className="bg-gradient-to-r from-teal-50 to-orange-50 dark:from-teal-900/30 dark:to-orange-900/30 rounded-xl p-4 border border-teal-200 dark:border-teal-700">
                           <div className="flex justify-between items-center">
                             <div className="text-center">
                               <p className="text-2xl font-bold text-teal-600">{unlockedBadges.length}</p>
-                              <p className="text-sm text-gray-600">Sbloccati</p>
+                              <p className="text-sm text-gray-600 dark:text-gray-300">Sbloccati</p>
                             </div>
                             <div className="text-center">
                               <p className="text-2xl font-bold text-orange-600">{lockedBadges.length}</p>
-                              <p className="text-sm text-gray-600">Da sbloccare</p>
+                              <p className="text-sm text-gray-600 dark:text-gray-300">Da sbloccare</p>
                             </div>
                             <div className="text-center">
                               <p className="text-2xl font-bold text-gray-800">{badges.length}</p>
-                              <p className="text-sm text-gray-600">Totali</p>
+                              <p className="text-sm text-gray-600 dark:text-gray-300">Totali</p>
                             </div>
                           </div>
                         </div>
@@ -269,10 +269,10 @@ export const UserProfileModal = ({ isOpen, onClose, userId, username }: UserProf
 
                             return (
                               <div key={categoryKey} className="space-y-4">
-                                <div className="sticky top-0 bg-white/90 backdrop-blur-sm py-2 -mx-2 px-2 border-b border-gray-100">
-                                  <h3 className="font-semibold text-gray-800 flex items-center justify-between">
+                                <div className="sticky top-0 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm py-2 -mx-2 px-2 border-b border-gray-100 dark:border-gray-700">
+                                  <h3 className="font-semibold text-gray-800 dark:text-white flex items-center justify-between">
                                     {getCategoryDisplayName(categoryKey)}
-                                    <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
+                                    <span className="text-xs text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded-full">
                                       {unlockedInCategory.length}/{categoryBadges.length}
                                     </span>
                                   </h3>
@@ -295,7 +295,7 @@ export const UserProfileModal = ({ isOpen, onClose, userId, username }: UserProf
                                     ))}
                                     {lockedInCategory.length > 3 && (
                                       <div className="text-center py-2">
-                                        <p className="text-sm text-gray-500">
+                                        <p className="text-sm text-gray-500 dark:text-gray-400">
                                           +{lockedInCategory.length - 3} altri badge da sbloccare
                                         </p>
                                       </div>
@@ -308,7 +308,7 @@ export const UserProfileModal = ({ isOpen, onClose, userId, username }: UserProf
                         </div>
 
                         {badges.length === 0 && (
-                          <p className="text-gray-500 text-center py-8">
+                          <p className="text-gray-500 dark:text-gray-400 text-center py-8">
                             Nessun badge disponibile
                           </p>
                         )}
@@ -326,18 +326,18 @@ export const UserProfileModal = ({ isOpen, onClose, userId, username }: UserProf
                           recentDrinks.map((drink) => (
                             <div
                               key={drink.id}
-                              className="bg-gray-50 rounded-xl p-4"
+                              className="bg-gray-50 dark:bg-gray-700 rounded-xl p-4"
                             >
                               <div className="flex justify-between items-center">
                                 <div>
-                                  <p className="font-semibold text-gray-800">{drink.type}</p>
-                                  <p className="text-sm text-gray-600">
+                                  <p className="font-semibold text-gray-800 dark:text-white">{drink.type}</p>
+                                  <p className="text-sm text-gray-600 dark:text-gray-300">
                                     {new Date(drink.date).toLocaleDateString('it-IT')} • {drink.location}
                                   </p>
                                 </div>
                                 <div className="text-right">
                                   <p className="font-semibold text-teal-600">€{drink.cost.toFixed(2)}</p>
-                                  <p className="text-xs text-gray-500">
+                                  <p className="text-xs text-gray-500 dark:text-gray-400">
                                     {new Date(drink.created_at).toLocaleTimeString('it-IT', {
                                       hour: '2-digit',
                                       minute: '2-digit'
@@ -348,7 +348,7 @@ export const UserProfileModal = ({ isOpen, onClose, userId, username }: UserProf
                             </div>
                           ))
                         ) : (
-                          <p className="text-gray-500 text-center py-8">
+                          <p className="text-gray-500 dark:text-gray-400 text-center py-8">
                             Nessun drink registrato di recente
                           </p>
                         )}

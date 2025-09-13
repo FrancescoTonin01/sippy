@@ -70,23 +70,23 @@ export const GroupBudgetModal = ({
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            className="bg-white rounded-2xl p-6 w-full max-w-sm shadow-xl"
+            className="bg-white dark:bg-gray-800 rounded-2xl p-6 w-full max-w-sm shadow-xl"
             onClick={(e) => e.stopPropagation()}
           >
-            <h2 className="text-xl font-bold text-gray-800 mb-2">
+            <h2 className="text-xl font-bold text-gray-800 dark:text-white mb-2">
               Imposta Obiettivo Gruppo
             </h2>
-            <p className="text-gray-600 mb-6 text-sm">
+            <p className="text-gray-600 dark:text-gray-300 mb-6 text-sm">
               Imposta un budget settimanale per {groupName}. Tutti i membri dovranno rimanere sotto questo limite per mantenere la streak.
             </p>
 
             <form onSubmit={handleSubmit}>
               <div className="mb-4">
-                <label htmlFor="budget" className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="budget" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Budget settimanale (€)
                 </label>
                 <div className="relative">
-                  <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">€</span>
+                  <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400">€</span>
                   <input
                     id="budget"
                     type="number"
@@ -94,7 +94,7 @@ export const GroupBudgetModal = ({
                     min="0"
                     value={budget}
                     onChange={(e) => setBudget(e.target.value)}
-                    className="w-full pl-8 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+                    className="w-full pl-8 pr-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
                     placeholder="0.00"
                     disabled={loading}
                     required
@@ -103,8 +103,8 @@ export const GroupBudgetModal = ({
               </div>
 
               {error && (
-                <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
-                  <p className="text-red-700 text-sm">{error}</p>
+                <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-700 rounded-lg">
+                  <p className="text-red-700 dark:text-red-300 text-sm">{error}</p>
                 </div>
               )}
 
@@ -113,14 +113,14 @@ export const GroupBudgetModal = ({
                   type="button"
                   onClick={handleClose}
                   disabled={loading}
-                  className="flex-1 py-2 px-4 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50"
+                  className="flex-1 py-2 px-4 text-gray-600 dark:text-gray-300 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors disabled:opacity-50"
                 >
                   Annulla
                 </button>
                 <button
                   type="submit"
                   disabled={loading}
-                  className="flex-1 py-2 px-4 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                  className="flex-1 py-2 px-4 bg-teal-600 dark:bg-teal-700 text-white rounded-lg hover:bg-teal-700 dark:hover:bg-teal-600 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
                 >
                   {loading ? (
                     <>
@@ -134,8 +134,8 @@ export const GroupBudgetModal = ({
               </div>
             </form>
 
-            <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-              <p className="text-blue-800 text-xs">
+            <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-700 rounded-lg">
+              <p className="text-blue-800 dark:text-blue-300 text-xs">
                 💡 <strong>Suggerimento:</strong> Un budget di €0 disabilita l'obiettivo gruppo. 
                 I membri potranno comunque vedere la classifica settimanale.
               </p>

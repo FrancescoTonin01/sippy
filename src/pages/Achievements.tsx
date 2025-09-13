@@ -51,60 +51,60 @@ export const Achievements = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Caricamento achievements...</p>
+          <p className="text-gray-600 dark:text-gray-300">Caricamento achievements...</p>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4 pb-20">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-4 pb-20">
       <div className="max-w-md mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-white rounded-2xl shadow-lg p-6 mb-6"
+          className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 mb-6"
         >
-          <h1 className="text-2xl font-bold text-gray-800 mb-4">
+          <h1 className="text-2xl font-bold text-gray-800 dark:text-white mb-4">
             🏅 I tuoi Achievement
           </h1>
           
           <div className="grid grid-cols-3 gap-4 mb-6">
             <div className="text-center">
               <div className="text-2xl font-bold text-teal-600">{stats?.totalDrinks || 0}</div>
-              <div className="text-sm text-gray-600">Drink totali</div>
+              <div className="text-sm text-gray-600 dark:text-gray-300">Drink totali</div>
             </div>
             <div className="text-center">
               <div className="text-2xl font-bold text-orange-600">{unlockedBadges.length}</div>
-              <div className="text-sm text-gray-600">Badge sbloccati</div>
+              <div className="text-sm text-gray-600 dark:text-gray-300">Badge sbloccati</div>
             </div>
             <div className="text-center">
               <div className="text-2xl font-bold text-gray-600">{objective?.weekly_budget || '-'}€</div>
-              <div className="text-sm text-gray-600">Spesa massima settimanale</div>
+              <div className="text-sm text-gray-600 dark:text-gray-300">Spesa massima settimanale</div>
             </div>
           </div>
 
           {/* Additional stats */}
           {stats && (
-            <div className="grid grid-cols-2 gap-4 pt-4 border-t border-gray-100">
+            <div className="grid grid-cols-2 gap-4 pt-4 border-t border-gray-100 dark:border-gray-700">
               <div className="text-center">
                 <div className="text-lg font-semibold text-teal-600">€{stats.totalSpent.toFixed(2)}</div>
-                <div className="text-xs text-gray-500">Spesa totale</div>
+                <div className="text-xs text-gray-500 dark:text-gray-400">Spesa totale</div>
               </div>
               <div className="text-center">
                 <div className="text-lg font-semibold text-orange-600">{stats.groupsCount}</div>
-                <div className="text-xs text-gray-500">Gruppi</div>
+                <div className="text-xs text-gray-500 dark:text-gray-400">Gruppi</div>
               </div>
               <div className="text-center">
                 <div className="text-lg font-semibold text-green-600">{stats.achievedWeeklyGoals}</div>
-                <div className="text-xs text-gray-500">Obiettivi raggiunti</div>
+                <div className="text-xs text-gray-500 dark:text-gray-400">Obiettivi raggiunti</div>
               </div>
               <div className="text-center">
                 <div className="text-lg font-semibold text-red-600">{stats.maxStreakWeeks}</div>
-                <div className="text-xs text-gray-500">Record streak</div>
+                <div className="text-xs text-gray-500 dark:text-gray-400">Record streak</div>
               </div>
             </div>
           )}
@@ -123,13 +123,13 @@ export const Achievements = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 + categoryIndex * 0.1 }}
-              className="bg-white rounded-2xl shadow-lg p-6 mb-6"
+              className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 mb-6"
             >
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-semibold text-gray-800">
+                <h2 className="text-lg font-semibold text-gray-800 dark:text-white">
                   {getCategoryDisplayName(categoryKey)}
                 </h2>
-                <span className="text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
+                <span className="text-sm text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 px-3 py-1 rounded-full">
                   {unlockedInCategory.length}/{categoryBadges.length}
                 </span>
               </div>
@@ -137,7 +137,7 @@ export const Achievements = () => {
               {/* Unlocked badges in this category */}
               {unlockedInCategory.length > 0 && (
                 <div className="mb-6">
-                  <h3 className="text-sm font-medium text-green-700 mb-3 flex items-center">
+                  <h3 className="text-sm font-medium text-green-700 dark:text-green-400 mb-3 flex items-center">
                     <span className="mr-2">✨</span>
                     Sbloccati ({unlockedInCategory.length})
                   </h3>
@@ -152,7 +152,7 @@ export const Achievements = () => {
               {/* Locked badges in this category */}
               {lockedInCategory.length > 0 && (
                 <div>
-                  <h3 className="text-sm font-medium text-gray-600 mb-3 flex items-center">
+                  <h3 className="text-sm font-medium text-gray-600 dark:text-gray-300 mb-3 flex items-center">
                     <span className="mr-2">🔒</span>
                     Da sbloccare ({lockedInCategory.length})
                   </h3>
@@ -161,11 +161,11 @@ export const Achievements = () => {
                       <Badge key={badge.id} badge={badge} delay={index * 0.05} />
                     ))}
                     {lockedInCategory.length > 3 && (
-                      <div className="text-center py-3 bg-gray-50 rounded-lg">
-                        <p className="text-sm text-gray-500">
+                      <div className="text-center py-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                        <p className="text-sm text-gray-500 dark:text-gray-400">
                           +{lockedInCategory.length - 3} altri badge da sbloccare
                         </p>
-                        <p className="text-xs text-gray-400 mt-1">
+                        <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
                           Continua a raggiungere obiettivi per vederli tutti!
                         </p>
                       </div>
@@ -182,13 +182,13 @@ export const Achievements = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="bg-white rounded-2xl shadow-lg p-8 text-center"
+            className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 text-center"
           >
             <div className="text-4xl mb-4">🏅</div>
-            <h2 className="text-lg font-semibold text-gray-800 mb-2">
+            <h2 className="text-lg font-semibold text-gray-800 dark:text-white mb-2">
               Nessun badge disponibile
             </h2>
-            <p className="text-gray-600">
+            <p className="text-gray-600 dark:text-gray-300">
               Inizia a registrare i tuoi drink per sbloccare i primi badge!
             </p>
           </motion.div>

@@ -38,8 +38,8 @@ export const WeeklyChart = ({ weeklyDrinks }: WeeklyChartProps) => {
   const maxCount = Math.max(...chartData.map(d => d.count), 1)
 
   return (
-    <div className="bg-white rounded-2xl shadow-lg p-6">
-      <h2 className="text-lg font-semibold text-gray-800 mb-4">
+    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6">
+      <h2 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">
         Drink per giorno
       </h2>
       
@@ -61,8 +61,8 @@ export const WeeklyChart = ({ weeklyDrinks }: WeeklyChartProps) => {
                 transition={{ delay: index * 0.1, duration: 0.6 }}
                 className={`w-full rounded-t-lg ${
                   day.count > 0 
-                    ? 'bg-teal-500 shadow-sm' 
-                    : 'bg-gray-200'
+                    ? 'bg-teal-500 dark:bg-teal-600 shadow-sm' 
+                    : 'bg-gray-200 dark:bg-gray-600'
                 }`}
               />
               {day.count > 0 && (
@@ -70,14 +70,14 @@ export const WeeklyChart = ({ weeklyDrinks }: WeeklyChartProps) => {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: index * 0.1 + 0.3 }}
-                  className="text-xs font-semibold text-teal-600"
+                  className="text-xs font-semibold text-teal-600 dark:text-teal-400"
                 >
                   {day.count}
                 </motion.span>
               )}
             </div>
             
-            <span className="text-xs text-gray-600 font-medium">
+            <span className="text-xs text-gray-600 dark:text-gray-300 font-medium">
               {day.name}
             </span>
           </motion.div>
@@ -85,7 +85,7 @@ export const WeeklyChart = ({ weeklyDrinks }: WeeklyChartProps) => {
       </div>
       
       {weeklyDrinks.length === 0 && (
-        <p className="text-center text-gray-500 text-sm mt-4">
+        <p className="text-center text-gray-500 dark:text-gray-400 text-sm mt-4">
           Nessun drink registrato questa settimana
         </p>
       )}

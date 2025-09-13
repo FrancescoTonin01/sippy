@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useAuth } from './useAuth'
-import { getDrinks, getWeeklyDrinks, createDrink } from '../api/drinks'
+import { getDrinks, getWeeklyDrinks, createDrink, deleteDrink } from '../api/drinks'
 import { getStartOfWeek } from '../utils/dateHelpers'
 import type { Drink, CreateDrinkData } from '../api/drinks'
 
@@ -80,6 +80,25 @@ export const useDrinks = () => {
     }
   }
 
+  const removeDrink = async (drinkId: string) => {
+    if (!user) return { success: false, error: 'Utente non autenticato' }
+
+    try {
+      const { error: deleteError } = await deleteDrink(drinkId)
+      
+      if (deleteError) {
+        return { success: false, error: deleteError.message }
+      }
+
+      setDrinks(drinks.filter(drink => drink.id !== drinkId))
+      setWeeklyDrinks(weeklyDrinks.filter(drink => drink.id !== drinkId))
+
+      return { success: true }
+    } catch {
+      return { success: false, error: 'Errore nella rimozione del drink' }
+    }
+  }
+
   useEffect(() => {
     if (user) {
       fetchWeeklyDrinks()
@@ -93,6 +112,7 @@ export const useDrinks = () => {
     error,
     fetchDrinks,
     fetchWeeklyDrinks,
-    addDrink
+    addDrink,
+    removeDrink
   }
 }
